@@ -58,6 +58,9 @@ class Tile(ABC):
     def get_neighbour_impl(self, i, generate=True):
         pass
 
+    def is_available(self):
+        return self.gctx.n_steps_out <= 4
+
 class OriginNode(Tile):
     def __init__(self, gctx):
         super(OriginNode, self).__init__(gctx)
@@ -78,8 +81,6 @@ class MajorNode(Tile):
         super(MajorNode, self).__init__(gctx)
 
         self.children = [None for _ in range(3)]
-        if gctx.n_steps_out > 4:
-            self.children = [StopNode for _ in range(3)]
 
         self.parent = parent
         self.parent_idx = parent_idx
@@ -121,8 +122,6 @@ class MinorNode(Tile):
         super(MinorNode, self).__init__(gctx)
 
         self.children = [None for _ in range(2)]
-        if gctx.n_steps_out > 4:
-            self.children = [StopNode for _ in range(2)]
 
         self.parent = parent
         self.parent_idx = parent_idx
