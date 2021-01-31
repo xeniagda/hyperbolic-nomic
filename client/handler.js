@@ -15,8 +15,6 @@ SPACING = 0.05;
 
 function draw(idx, corners, center) {
     let id = "tile-" + idx;
-    let color = rgb2hex(idx * 191 + 138, idx * 9 + 130, idx * 140 + 107); // Arbitrary "random" combination
-    console.log(color);
 
     let outer = document.createElement("div");
     outer.id = id;
@@ -56,7 +54,6 @@ function draw(idx, corners, center) {
     console.log(clippath);
 
     inner.setAttribute("style", "clip-path: " + clippath);
-    inner.style.background = color;
 
     outer.appendChild(inner);
 
