@@ -53,8 +53,8 @@ function draw(idx, corners, center) {
 
     var minr = 1, maxr = -1, mini = 1, maxi = -1;
     for (co of corners) {
-        minr = Math.min(minr, co.re);
-        maxr = Math.max(maxr, co.re);
+        minr = Math.min(minr, -co.re);
+        maxr = Math.max(maxr, -co.re);
         mini = Math.min(mini, co.im);
         maxi = Math.max(maxi, co.im);
     }
@@ -62,10 +62,10 @@ function draw(idx, corners, center) {
         outer.style.width = 0;
         outer.style.height = 0;
     } else {
-        outer.style.left = prec((minr + 1) / 2);
-        outer.style.top = prec((mini + 1) / 2);
-        outer.style.width = prec((maxr - minr) / 2);
-        outer.style.height = prec((maxi - mini) / 2);
+        outer.style.left = prec((mini + 1) / 2);
+        outer.style.top = prec((minr + 1) / 2);
+        outer.style.width = prec((maxi - mini) / 2);
+        outer.style.height = prec((maxr - minr) / 2);
     }
 
     var clippath = "polygon(";
@@ -73,8 +73,8 @@ function draw(idx, corners, center) {
         let c = corners[i];
         respacing = SPACING / (maxr - minr);
         c = math.add(math.mul(c, 1 - respacing), math.mul(center, respacing))
-        let x = (c.re - minr) / (maxr - minr);
-        let y = (c.im - mini) / (maxi - mini);
+        let x = (c.im - mini) / (maxi - mini);
+        let y = (-c.re - minr) / (maxr - minr);
 
         clippath += `${prec(x)} ${prec(y)}`;
         if (i !== corners.length - 1) {
@@ -85,12 +85,25 @@ function draw(idx, corners, center) {
 
     inner.setAttribute("style", "clip-path: " + clippath);
 
+    // What way is the thing facing?
+    // console.log(corners, center);
+    let angle_rad = (math.pi * 2 + math.arg(math.sub(math.div(math.add(corners[0], corners[1]), 2), center))) % (2 * math.pi);
+    let orientation = angle_rad / (2 * math.pi) * 7;
+    // console.log(angle_c1);
+    inner.innerText += "\n" + (0 | 10 * orientation) / 10;
+
+    outer.onclick = e => {
+        CURRENT_IDX = idx;
+        ORIENTATION = 0 | orientation;
+        run();
+    };
+
     if (is_new) {
         return () => {
-            outer.style.left = prec((minr + 1) / 2);
-            outer.style.top = prec((mini + 1) / 2);
-            outer.style.width = prec((maxr - minr) / 2);
-            outer.style.height = prec((maxi - mini) / 2);
+            outer.style.left = prec((mini + 1) / 2);
+            outer.style.top = prec((minr + 1) / 2);
+            outer.style.width = prec((maxi - mini) / 2);
+            outer.style.height = prec((maxr - minr) / 2);
         };
     } else {
         return () => {};
@@ -121,13 +134,13 @@ function get_all_ids(tile) {
 }
 
 async function run() {
-    a = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=4`)).json();
+    a = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`)).json();
 
     let to_render = get_all_ids(a);
     for (elem of Array.from(document.getElementsByClassName("cell-outer"))) {
         let idx = 0 | elem.dataset.idx;
         if (!to_render.includes(idx)) {
-            if (elem.style.width == 0) {
+            if (elem.style.width == "0px") {
                 elem.parentNode.removeChild(elem)
             } else {
                 elem.style.width = 0;

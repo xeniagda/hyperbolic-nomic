@@ -86,7 +86,7 @@ let side_circle_radius = side_circle_radius_sq ** 0.5;
 
 var origin_corners = [];
 for (var i = 0; i < p; i++) {
-    let angle = (-i + 0.5) / p * math.pi * 2 - math.pi / 2;
+    let angle = (-i + 0.5) / p * math.pi * 2;
     let unit_point = math.complex(math.cos(angle), math.sin(angle));
     let circle_center_point = math.mul(unit_point, corner_dist);
 
