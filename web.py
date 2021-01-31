@@ -6,24 +6,36 @@ from hypertiling import OriginNode, TileGenerationContext, NodeView
 WORLD = OriginNode(TileGenerationContext(0))
 WRITE_LOCK = asyncio.Lock()
 
-def render(view, render_distance, seen_at=None):
+def distances(view, render_distance, seen_at=None):
     if seen_at == None:
         seen_at = {}
 
     if view.node.idx in seen_at and seen_at[view.node.idx] > render_distance:
-        return None
+        return seen_at
 
     if render_distance == 0:
-        return None
+        return seen_at
 
     seen_at[view.node.idx] = render_distance
+    for i in range(7):
+        distances(view.get_neighbour(i), render_distance-1, seen_at)
 
     # if not tile.is_available():
     #     return None
+    return seen_at
+
+def render(view, seen_at, visited):
+    if view.node.idx not in seen_at:
+        return None
+
+    if view.node.idx in visited:
+        return None
+
+    visited.add(view.node.idx)
 
     neighbours = []
     for i in range(7):
-        neighbours.append(render(view.get_neighbour(i), render_distance - 1, seen_at))
+        neighbours.append(render(view.get_neighbour(i), seen_at, visited))
 
     return {
         "idx": view.node.idx,
@@ -50,11 +62,23 @@ async def tiles_around(req):
         if render_distance > 7:
             return web.Response(text="render distance too large", status=400)
 
+    if "orientation" not in req.query:
+        orientation = 0
+    else:
+        try:
+            orientation = int(req.query["orientation"])
+        except ValueError as e:
+            return web.Response(text="malformed orientation", status=400)
+        if orientation > 7:
+            return web.Response(text="render distance too large", status=400)
+
     tile = WORLD.get_child_with_idx(idx)
     if tile is None:
         return web.Response(text="no such idx", status=400)
+    nodeview = NodeView(tile, orientation)
 
-    data = render(NodeView(tile, 0), render_distance)
+    seen_at = distances(nodeview, render_distance)
+    data = render(nodeview, seen_at, set())
 
     return web.Response(text=json.dumps(data))
 
