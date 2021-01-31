@@ -11,20 +11,45 @@ function prec(x) {
     return x * 100 + "%";
 }
 
-SPACING = 0.05;
+SPACING = 0.015;
+
+CURRENT_IDX = 0;
+ORIENTATION = 0;
 
 function draw(idx, corners, center) {
     let id = "tile-" + idx;
 
-    let outer = document.createElement("div");
+    var is_new;
+    var outer;
+    if (document.getElementById(id) === null) {
+        outer = document.createElement("div");
+        document.getElementById("container").appendChild(outer);
+        is_new = true;
+    } else {
+        outer = document.getElementById(id);
+        is_new = false;
+    }
     outer.id = id;
+    outer.dataset.idx = idx;
     outer.classList.add("cell-outer");
     outer.style = `width: 100%; height: 100%;`;
 
-    let inner = document.createElement("div");
-    inner.classList.add("cell-inner");
+    var inner;
+    if (document.getElementById(id + "-inner") === null) {
+        inner = document.createElement("div");
+        outer.appendChild(inner);
+        inner.id = id + "-inner";
+    } else {
+        inner = document.getElementById(id + "-inner");
+    }
+    inner.innerText = idx;
 
-    console.log(corners);
+    inner.classList.add("cell-inner");
+    if (CURRENT_IDX == idx) {
+        outer.classList.add("active");
+    } else {
+        outer.classList.remove("active");
+    }
 
     var minr = 1, maxr = -1, mini = 1, maxi = -1;
     for (co of corners) {
@@ -33,15 +58,21 @@ function draw(idx, corners, center) {
         mini = Math.min(mini, co.im);
         maxi = Math.max(maxi, co.im);
     }
-    outer.style.left = prec((minr + 1) / 2);
-    outer.style.top = prec((mini + 1) / 2);
-    outer.style.width = prec((maxr - minr) / 2);
-    outer.style.height = prec((maxi - mini) / 2);
+    if (is_new) {
+        outer.style.width = 0;
+        outer.style.height = 0;
+    } else {
+        outer.style.left = prec((minr + 1) / 2);
+        outer.style.top = prec((mini + 1) / 2);
+        outer.style.width = prec((maxr - minr) / 2);
+        outer.style.height = prec((maxi - mini) / 2);
+    }
 
     var clippath = "polygon(";
     for (var i = 0; i < corners.length; i++) {
         let c = corners[i];
-        c = math.add(math.mul(c, 1 - SPACING), math.mul(center, SPACING))
+        respacing = SPACING / (maxr - minr);
+        c = math.add(math.mul(c, 1 - respacing), math.mul(center, respacing))
         let x = (c.re - minr) / (maxr - minr);
         let y = (c.im - mini) / (maxi - mini);
 
@@ -51,28 +82,61 @@ function draw(idx, corners, center) {
         }
     }
     clippath += ");"
-    console.log(clippath);
 
     inner.setAttribute("style", "clip-path: " + clippath);
 
-    outer.appendChild(inner);
-
-    document.getElementById("container").appendChild(outer);
-}
-
-function render(tile, path) {
-    let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
-    draw(tile.idx, corners, center);
-    for (var i = 0; i < tile.neighbours.length; i++) {
-        if (tile.neighbours[i] !== null) {
-            let new_path = [...path, i];
-            render(tile.neighbours[i], new_path);
-        }
+    if (is_new) {
+        return () => {
+            outer.style.left = prec((minr + 1) / 2);
+            outer.style.top = prec((mini + 1) / 2);
+            outer.style.width = prec((maxr - minr) / 2);
+            outer.style.height = prec((maxi - mini) / 2);
+        };
+    } else {
+        return () => {};
     }
 }
 
+function render(tile, path) {
+    let fns = [];
+    let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
+    fns.push(draw(tile.idx, corners, center));
+    for (var i = 0; i < tile.neighbours.length; i++) {
+        if (tile.neighbours[i] !== null) {
+            let new_path = [...path, i];
+            fns.push(...render(tile.neighbours[i], new_path));
+        }
+    }
+    return fns;
+}
+
+function get_all_ids(tile) {
+    let ids = [tile.idx];
+    for (var i = 0; i < tile.neighbours.length; i++) {
+        if (tile.neighbours[i] !== null) {
+            ids.push(...get_all_ids(tile.neighbours[i]));
+        }
+    }
+    return ids;
+}
+
 async function run() {
-    a = await (await fetch("/api/tiles?idx=0&render_distance=4")).json();
-    render(a, []);
+    a = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=4`)).json();
+
+    let to_render = get_all_ids(a);
+    for (elem of Array.from(document.getElementsByClassName("cell-outer"))) {
+        let idx = 0 | elem.dataset.idx;
+        if (!to_render.includes(idx)) {
+            if (elem.style.width == 0) {
+                elem.parentNode.removeChild(elem)
+            } else {
+                elem.style.width = 0;
+                elem.style.height = 0;
+
+            }
+        }
+    }
+    let fns = render(a, []);
+    requestAnimationFrame(() => { for (fn of fns) { fn() } });
 }
 run();

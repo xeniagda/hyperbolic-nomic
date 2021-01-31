@@ -14,7 +14,7 @@ body {
     width: 50%;
     background-color: #eeeeee;
     box-shadow: 0px 0px 5px #888888;
-    border-radius: 50%;
+    border-radius: 60%;
 }
 
 #container:after {
@@ -25,15 +25,25 @@ body {
 
 
 .cell-outer {
+    transition: width 2s, height 2s, top 2s, left 2s;
     position: absolute;
-    transition: background 1s;
-    filter: drop-shadow(-0px 0px 1px #888888);
+    --col-shadow: #888888;
+    filter: drop-shadow(-0px 0px 3px var(--col-shadow));
 }
 
 .cell-inner {
     width: 100%;
     height: 100%;
     background: white;
+    transition: background-color 2s, clip-path 2s;
+    text-align: center;
+}
+
+.active {
+    --col-shadow: #bb8800;
+}
+.active > .cell-inner {
+    background: #ffbb00;
 }
 
 #p1-1 {
