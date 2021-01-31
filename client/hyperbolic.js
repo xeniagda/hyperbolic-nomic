@@ -33,7 +33,7 @@ function find_circle(p, q) {
     let h = math.multiply(math.complex(0, 1), math.sub(n, m));
     let x = h.re; let y = h.im;
 
-    if (b * c == a * d) {
+    if (Math.abs(b * c  - a * d) < 1e-5) {
         // Special case for line
         if (math.abs(math.div(p, q).im) > 1e-5) {
             console.log("math broke");
@@ -75,7 +75,7 @@ let side_circle_origin_dist = (corner_dist + 1 / corner_dist) / (2 * math.cos(al
 let side_circle_radius_sq = corner_dist ** 2 * (1 - math.cos(alpha) ** 2) + (side_circle_origin_dist - corner_dist * math.cos(alpha)) ** 2;
 let side_circle_radius = side_circle_radius_sq ** 0.5;
 
-function get_corners(path) {
+function get_corners_and_center(path) {
     if (path.length == 0) {
         var points = [];
         for (var i = 0; i < p; i++) {
@@ -85,16 +85,18 @@ function get_corners(path) {
 
             points.push(circle_center_point);
         }
+        points.push(math.complex(0, 0));
         return points;
     }
 
+    var path = [...path];
     let last_transform = path.splice(-1);
     let angle = last_transform / p * math.pi * 2;
     let unit_point = math.complex(math.cos(angle), math.sin(angle));
     let circle_center_point = math.mul(unit_point, side_circle_origin_dist);
 
-    var points = get_corners(path);
-    for (var i = 0; i < p; i++) {
+    var points = get_corners_and_center(path);
+    for (var i = 0; i < points.length; i++) {
         let pi = points[i];
         let z = math.sub(circle_center_point, pi);
         let z_ = invert_point(z, side_circle_radius);
