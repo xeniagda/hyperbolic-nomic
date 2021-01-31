@@ -66,7 +66,7 @@ class Tile(ABC):
         for ch in self.children:
             if ch is None:
                 continue
-            chid = ch.get_child_with_idx()
+            chid = ch.get_child_with_idx(idx)
             if chid is not None:
                 return chid
 
