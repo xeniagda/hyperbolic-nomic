@@ -19,8 +19,11 @@
 
 from abc import ABC, abstractmethod
 from copy import deepcopy
+from tiledata import TileData
+import pickle
 
 TILE_CTR = 0
+
 
 class TileGenerationContext:
     def __init__(self, n_steps_out):
@@ -33,6 +36,7 @@ class Tile(ABC):
         self.cache = [None for _ in range(7)]
         self.idx = TILE_CTR
         TILE_CTR += 1
+        self.assoc_data = TileData()
 
     def __str__(self):
         return f"{type(self).__name__}({self.idx})"
