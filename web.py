@@ -67,7 +67,11 @@ if __name__ == "__main__":
 
     app = web.Application()
 
-    app.add_routes([web.get("/api/tiles", tiles_around)])
+    app.add_routes([
+        web.get("/api/tiles", tiles_around),
+        web.get("/", lambda req: web.Response(status=301, headers={"Location": "index.html"})),
+        web.static("/", "client"),
+    ])
     app.on_shutdown.append(on_shutdown)
 
     web.run_app(app, port=9080)
