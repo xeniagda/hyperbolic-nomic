@@ -113,6 +113,7 @@ function draw(idx, corners, center) {
 function render(tile, path) {
     let fns = [];
     let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
+    corners = reorient(corners, tile.orientation);
     fns.push(draw(tile.idx, corners, center));
     for (var i = 0; i < tile.neighbours.length; i++) {
         if (tile.neighbours[i] !== null) {

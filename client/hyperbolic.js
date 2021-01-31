@@ -93,6 +93,14 @@ for (var i = 0; i < p; i++) {
     origin_corners.push(circle_center_point);
 }
 
+function reorient(poly, new_orientation) {
+    let new_poly = [];
+    for (var i = 0; i < poly.length; i++) {
+        new_poly.push(poly[(i - new_orientation + poly.length) % poly.length]);
+    }
+    return new_poly;
+}
+
 
 // poly[0] and poly[1] are side 0
 function transform_poly_along_side(poly, side, extra_points) {

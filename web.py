@@ -21,6 +21,7 @@ def render(view, render_distance, seen_at):
 
     return {
         "idx": view.node.idx,
+        "orientation": view.orientation,
         "assoc_data": view.node.assoc_data.into_json_struct(),
         "neighbours": neighbours,
     }
