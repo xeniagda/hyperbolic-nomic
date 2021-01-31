@@ -59,6 +59,19 @@ class Tile(ABC):
                 out.append((ch.assoc_data, ch.get_all_chilren_and_data()))
         return out
 
+    def get_child_with_idx(self, idx):
+        if self.idx == idx:
+            return self
+
+        for ch in self.children:
+            if ch is None:
+                continue
+            chid = ch.get_child_with_idx()
+            if chid is not None:
+                return chid
+
+        return None
+
     def __str__(self):
         return f"{type(self).__name__}({self.idx})"
 

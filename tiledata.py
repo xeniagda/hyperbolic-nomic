@@ -11,3 +11,5 @@ class TileData:
     def __repr__(self):
         return f"TileData({','.join(repr(k) + '=' + repr(v) for k, v in self.fields.items())})"
 
+    def into_json_struct(self):
+        return self.fields
