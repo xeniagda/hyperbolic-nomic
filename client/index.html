@@ -3,11 +3,23 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.1.0/math.min.js"></script>
         <script src="hyperbolic.js"></script>
         <style>
+
+body {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
 #container {
     position: absolute;
-    width: 100%;
-    height: 100%;
+    width: 50%;
     background-color: blue;
+    border-radius: 50%;
+}
+
+#container:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
 }
 
 
@@ -19,6 +31,7 @@
 .cell-inner {
     width: 100%;
     height: 100%;
+    background: green;
 }
 
 #p1-1 {
@@ -39,9 +52,7 @@
         </style>
     </head>
     <body>
-        <div id="stretcher">
-            <div id="container">
-            </div>
+        <div id="container">
         </div>
     </body>
     <script src="handler.js"></script>
