@@ -7,14 +7,11 @@ function rgb2hex(r, g, b) {
     return "#" + hexpair(r) + hexpair(g) + hexpair(b);
 }
 
-function comp2prec(z) {
-    let x = z.re;
-    let y = z.im;
-    return [(x + 1) * 50 + "%", (y + 1) * 50 + "%"];
+function prec(x) {
+    return x * 100 + "%";
 }
 
-function render(tile, path) {
-    let idx = tile.idx;
+function draw(idx, corners) {
     let id = "tile-" + idx;
     let color = rgb2hex(idx * 191 + 138, idx * 9 + 130, idx * 140 + 107); // Arbitrary "random" combination
     console.log(color);
@@ -27,17 +24,27 @@ function render(tile, path) {
     let inner = document.createElement("div");
     inner.classList.add("cell-inner");
 
-    let corners = get_corners_and_center(path);
-    let center = corners.splice(-1);
-
     console.log(corners);
-    var clippath = "polygon(";
 
+    var minr = 1, maxr = -1, mini = 1, maxi = -1;
+    for (co of corners) {
+        minr = Math.min(minr, co.re);
+        maxr = Math.max(maxr, co.re);
+        mini = Math.min(mini, co.im);
+        maxi = Math.max(maxi, co.im);
+    }
+    outer.style.left = prec((minr + 1) / 2);
+    outer.style.top = prec((mini + 1) / 2);
+    outer.style.width = prec((maxr - minr) / 2);
+    outer.style.height = prec((maxi - mini) / 2);
+
+    var clippath = "polygon(";
     for (var i = 0; i < corners.length; i++) {
         let c = corners[i];
-        let [x, y] = comp2prec(c);
+        let x = (c.re - minr) / (maxr - minr);
+        let y = (c.im - mini) / (maxi - mini);
 
-        clippath += `${x} ${y}`;
+        clippath += `${prec(x)} ${prec(y)}`;
         if (i !== corners.length - 1) {
             clippath += ",";
         }
@@ -51,19 +58,21 @@ function render(tile, path) {
     outer.appendChild(inner);
 
     document.getElementById("container").appendChild(outer);
+}
 
+function render(tile, path) {
+    let corners = transform_poly_along_path(origin_corners, path);
+    draw(tile.idx, corners);
     for (var i = 0; i < tile.neighbours.length; i++) {
-        let ch = tile.neighbours[i];
-        if (ch === null) {
-            continue;
+        if (tile.neighbours[i] !== null) {
+            let new_path = [...path, i];
+            render(tile.neighbours[i], new_path);
         }
-        let new_path = [...path, i];
-        render(ch, new_path);
     }
 }
 
 async function run() {
-    a = await (await fetch("/api/tiles?idx=0")).json();
+    a = await (await fetch("/api/tiles?idx=0&render_distance=4")).json();
     render(a, []);
 }
 run();

@@ -4,6 +4,7 @@
         <script src="hyperbolic.js"></script>
         <style>
 #container {
+    position: absolute;
     width: 100%;
     height: 100%;
     background-color: blue;
@@ -13,11 +14,6 @@
 .cell-outer {
     position: absolute;
     transition: background 1s;
-}
-
-.mask {
-    width: 100%;
-    height: 100%;
 }
 
 .cell-inner {
@@ -43,14 +39,8 @@
         </style>
     </head>
     <body>
-        <div id="container">
-            aaa
-            <div class="cell-outer" id="p1-1">
-                <div class="mask" id="p1-1-m1">
-                    <div class="mask" id="p1-1-m2">
-                        <div class="mask cell-inner"></div>
-                    </div>
-                </div>
+        <div id="stretcher">
+            <div id="container">
             </div>
         </div>
     </body>

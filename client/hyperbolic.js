@@ -11,6 +11,12 @@ class Circle {
         this.origin = origin;
         this.radius = radius;
     }
+    invert(z) {
+        let v = math.sub(z, this.origin);
+        let v_ = invert_point(v, this.radius);
+        let z_ = math.add(v_, this.origin);
+        return z_;
+    }
 }
 
 class Line {
@@ -20,11 +26,14 @@ class Line {
             this.pouc = math.multiply(this.pouc, -1);
         }
     }
+    invert(z) {
+        return math.mul(this.pouc, math.div(z, this.pouc).conjugate());
+    }
 }
 
 // p and q are points inside the circle. this finds a hyperbolic line, a circle normalling the unit
 // circle twice. May return a Line
-function find_circle(p, q) {
+function find_ext_circle(p, q) {
     let m = math.div(math.add(p, invert_point(p)), 2);
     let n = math.div(math.add(q, invert_point(q)), 2);
 
@@ -75,34 +84,40 @@ let side_circle_origin_dist = (corner_dist + 1 / corner_dist) / (2 * math.cos(al
 let side_circle_radius_sq = corner_dist ** 2 * (1 - math.cos(alpha) ** 2) + (side_circle_origin_dist - corner_dist * math.cos(alpha)) ** 2;
 let side_circle_radius = side_circle_radius_sq ** 0.5;
 
-function get_corners_and_center(path) {
-    if (path.length == 0) {
-        var points = [];
-        for (var i = 0; i < p; i++) {
-            let angle = (i + 0.5) / p * math.pi * 2;
-            let unit_point = math.complex(math.cos(angle), math.sin(angle));
-            let circle_center_point = math.mul(unit_point, corner_dist);
-
-            points.push(circle_center_point);
-        }
-        points.push(math.complex(0, 0));
-        return points;
-    }
-
-    var path = [...path];
-    let last_transform = path.splice(-1);
-    let angle = last_transform / p * math.pi * 2;
+var origin_corners = [];
+for (var i = 0; i < p; i++) {
+    let angle = (-i + 0.5) / p * math.pi * 2 - math.pi / 2;
     let unit_point = math.complex(math.cos(angle), math.sin(angle));
-    let circle_center_point = math.mul(unit_point, side_circle_origin_dist);
+    let circle_center_point = math.mul(unit_point, corner_dist);
 
-    var points = get_corners_and_center(path);
-    for (var i = 0; i < points.length; i++) {
-        let pi = points[i];
-        let z = math.sub(circle_center_point, pi);
-        let z_ = invert_point(z, side_circle_radius);
-        let pi_ = math.sub(circle_center_point, z_);
+    origin_corners.push(circle_center_point);
+}
 
-        points[i] = pi_;
+
+// poly[0] and poly[1] are side 0
+function transform_poly_along_side(poly, side) {
+    let c0 = poly[side];
+    let c1 = poly[(side + 1) % poly.length];
+    let inverter = find_ext_circle(c0, c1);
+
+    let new_poly = [];
+    for (var i = 0; i < poly.length; i++) {
+        // i = 0 gives point side+1
+        // i = 1 gives point side
+        var idx = side + 1 - i;
+
+        idx %= poly.length;
+        idx += poly.length; // aaaaaaaa
+        idx %= poly.length;
+
+        new_poly.push(inverter.invert(poly[idx]));
     }
-    return points;
+    return new_poly;
+}
+
+function transform_poly_along_path(poly, path) {
+    for (side of path) {
+        poly = transform_poly_along_side(poly, side);
+    }
+    return poly;
 }
