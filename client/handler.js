@@ -94,7 +94,7 @@ function draw(idx, corners, center) {
 
     outer.onclick = e => {
         CURRENT_IDX = idx;
-        ORIENTATION = 0 | orientation;
+        ORIENTATION = 0 | (0.5 + orientation);
         run();
     };
 
