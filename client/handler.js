@@ -11,7 +11,9 @@ function prec(x) {
     return x * 100 + "%";
 }
 
-function draw(idx, corners) {
+SPACING = 0.05;
+
+function draw(idx, corners, center) {
     let id = "tile-" + idx;
     let color = rgb2hex(idx * 191 + 138, idx * 9 + 130, idx * 140 + 107); // Arbitrary "random" combination
     console.log(color);
@@ -41,6 +43,7 @@ function draw(idx, corners) {
     var clippath = "polygon(";
     for (var i = 0; i < corners.length; i++) {
         let c = corners[i];
+        c = math.add(math.mul(c, 1 - SPACING), math.mul(center, SPACING))
         let x = (c.re - minr) / (maxr - minr);
         let y = (c.im - mini) / (maxi - mini);
 
@@ -61,8 +64,8 @@ function draw(idx, corners) {
 }
 
 function render(tile, path) {
-    let corners = transform_poly_along_path(origin_corners, path);
-    draw(tile.idx, corners);
+    let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
+    draw(tile.idx, corners, center);
     for (var i = 0; i < tile.neighbours.length; i++) {
         if (tile.neighbours[i] !== null) {
             let new_path = [...path, i];

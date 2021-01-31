@@ -95,7 +95,7 @@ for (var i = 0; i < p; i++) {
 
 
 // poly[0] and poly[1] are side 0
-function transform_poly_along_side(poly, side) {
+function transform_poly_along_side(poly, side, extra_points) {
     let c0 = poly[side];
     let c1 = poly[(side + 1) % poly.length];
     let inverter = find_ext_circle(c0, c1);
@@ -112,12 +112,24 @@ function transform_poly_along_side(poly, side) {
 
         new_poly.push(inverter.invert(poly[idx]));
     }
-    return new_poly;
+    let new_extra_points = [];
+    for (var i = 0; i < extra_points.length; i++) {
+        // i = 0 gives point side+1
+        // i = 1 gives point side
+        var idx = side + 1 - i;
+
+        idx %= extra_points.length;
+        idx += extra_points.length; // aaaaaaaa
+        idx %= extra_points.length;
+
+        new_extra_points.push(inverter.invert(extra_points[idx]));
+    }
+    return [new_poly, new_extra_points];
 }
 
-function transform_poly_along_path(poly, path) {
+function transform_poly_along_path(poly, path, extra_points) {
     for (side of path) {
-        poly = transform_poly_along_side(poly, side);
+        [poly, extra_points] = transform_poly_along_side(poly, side, extra_points);
     }
-    return poly;
+    return [poly, extra_points];
 }
