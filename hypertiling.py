@@ -38,6 +38,27 @@ class Tile(ABC):
         TILE_CTR += 1
         self.assoc_data = TileData()
 
+    # Don't pickle the cache!
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Don't pickle baz
+        del state["cache"]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Add baz back since it doesn't exist in the pickle
+        self.cache = [None for _ in range(7)]
+
+    def get_all_chilren_and_data(self):
+        out = []
+        for i, ch in enumerate(self.children):
+            if ch == None:
+                out.append(None)
+            else:
+                out.append((ch.assoc_data, ch.get_all_chilren_and_data()))
+        return out
+
     def __str__(self):
         return f"{type(self).__name__}({self.idx})"
 
@@ -162,5 +183,15 @@ class MinorNode(Tile):
         if i == 6:
             return self.parent.get_neighbour(self.parent_idx + 1, generate)
 
+if __name__ == "__main__":
+    n = OriginNode(TileGenerationContext(0))
+    n.get_neighbour(1).get_neighbour(4).get_neighbour(1).get_neighbour(3).assoc_data.set_field("weeee", "baaa")
 
+    print(n.get_all_chilren_and_data())
 
+    p = pickle.dumps(n)
+    print(p)
+
+    nn = pickle.loads(p)
+
+    print(nn.get_all_chilren_and_data())
