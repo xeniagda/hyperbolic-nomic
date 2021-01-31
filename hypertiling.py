@@ -48,7 +48,7 @@ class Tile(ABC):
     def __setstate__(self, state):
         self.__dict__.update(state)
         # Add baz back since it doesn't exist in the pickle
-        self.cache = [None for _ in range(7)]
+        self.cache = [(None, None) for _ in range(7)]
 
     def get_all_chilren_and_data(self):
         out = []
@@ -78,18 +78,20 @@ class Tile(ABC):
     __repr__ = __str__
 
     # Caches the result
-    def get_neighbour(self, i, generate=True):
+    def get_neighbour(self, i):
         i %= 7
-        if self.cache[i] is not None:
+        if self.cache[i] == (None, None):
             return self.cache[i]
         else:
-            n = self.get_neighbour_impl(i, generate)
+            n = self.get_neighbour_impl(i)
             self.cache[i] = n
             return n
 
     # Does not cache the result
+    # Gives a tuple (node, edge number) where node is the neighoubring node, and edge is the edge
+    # that the neighbour connects with
     @abstractmethod
-    def get_neighbour_impl(self, i, generate=True):
+    def get_neighbour_impl(self, i):
         pass
 
     def is_available(self):
@@ -101,14 +103,14 @@ class OriginNode(Tile):
 
         self.children = [None for _ in range(7)]
 
-    def get_neighbour_impl(self, i, generate=True):
-        if self.children[i] is None and generate:
+    def get_neighbour_impl(self, i):
+        if self.children[i] is None:
             gctx = deepcopy(self.gctx)
             gctx.n_steps_out += 1
 
             self.children[i] = MajorNode(gctx, self, i)
 
-        return self.children[i]
+        return self.children[i], 0
 
 class MajorNode(Tile):
     def __init__(self, gctx, parent, parent_idx):
@@ -119,13 +121,13 @@ class MajorNode(Tile):
         self.parent = parent
         self.parent_idx = parent_idx
 
-    def get_neighbour_impl(self, i, generate=True):
+    def get_neighbour_impl(self, i):
         if i == 0:
-            return self.parent
+            return self.parent, self.parent_idx
 
         if 2 <= i <= 4:
             c = i - 2
-            if self.children[c] is None and generate:
+            if self.children[c] is None:
                 gctx = deepcopy(self.gctx)
                 gctx.n_steps_out += 1
 
@@ -135,20 +137,24 @@ class MajorNode(Tile):
                     child = MajorNode(gctx, self, i)
 
                 self.children[c] = child
-            return self.children[c]
+            return self.children[c], 0
 
         if i == 1:
-            return self.parent.get_neighbour(self.parent_idx - 1, generate)
+            return self.parent.get_neighbour(self.parent_idx - 1)[0], 6
 
         if i == 5:
-            neighbour_parent = self.get_neighbour(6, generate)
+            neighbour_parent = self.get_neighbour(6)[0]
             if isinstance(neighbour_parent, MajorNode):
-                return neighbour_parent.get_neighbour(2, generate)
+                return neighbour_parent.get_neighbour(2)[0], 1
             else:
-                return neighbour_parent.get_neighbour(3, generate)
+                return neighbour_parent.get_neighbour(3)[0], 1
 
         if i == 6:
-            return self.parent.get_neighbour(self.parent_idx + 1, generate)
+            n = self.parent.get_neighbour(self.parent_idx + 1)[0]
+            if isinstance(n, MajorNode):
+                return n, 1
+            else:
+                return n, 2
 
 
 class MinorNode(Tile):
@@ -160,13 +166,13 @@ class MinorNode(Tile):
         self.parent = parent
         self.parent_idx = parent_idx
 
-    def get_neighbour_impl(self, i, generate=True):
+    def get_neighbour_impl(self, i):
         if i == 0:
-            return self.parent
+            return self.parent, self.parent_idx
 
         if 3 <= i <= 4:
             c = i - 3
-            if self.children[c] is None and generate:
+            if self.children[c] is None:
                 gctx = deepcopy(self.gctx)
                 gctx.n_steps_out += 1
 
@@ -177,34 +183,40 @@ class MinorNode(Tile):
 
                 self.children[c] = child
 
-            return self.children[c]
+            return self.children[c], 0
 
         if i == 1:
-            return self.parent.get_neighbour(self.parent_idx - 1, generate)
+            return self.parent.get_neighbour(self.parent_idx - 1)[0], 5
 
         if i == 2:
-            neighbour_parent = self.get_neighbour(1, generate)
-            return neighbour_parent.get_neighbour(4, generate)
+            neighbour_parent = self.get_neighbour(1)[0]
+            return neighbour_parent.get_neighbour(4)[0], 6
 
         if i == 5:
-            neighbour_parent = self.get_neighbour(6, generate)
+            neighbour_parent = self.get_neighbour(6)[0]
             if isinstance(neighbour_parent, MajorNode):
-                return neighbour_parent.get_neighbour(2, generate)
+                return neighbour_parent.get_neighbour(2)[0], 1
             else:
-                return neighbour_parent.get_neighbour(3, generate)
+                return neighbour_parent.get_neighbour(3)[0], 1
 
         if i == 6:
-            return self.parent.get_neighbour(self.parent_idx + 1, generate)
+            return self.parent.get_neighbour(self.parent_idx + 1)[0], 2
+
+class NodeView:
+    def __init__(self, node, orientation):
+        # Represents this node, but artifically parented at edge orientation
+        self.node = node
+        self.orientation = orientation
+
+    def get_neighbour(self, idx):
+        real_idx = self.orientation + idx
+        node, orientation = self.node.get_neighbour(real_idx)
+        return NodeView(node, orientation)
+
+    def __str__(self):
+        return f'NodeView(orientation={self.orientation},node={self.node})'
 
 if __name__ == "__main__":
     n = OriginNode(TileGenerationContext(0))
-    n.get_neighbour(1).get_neighbour(4).get_neighbour(1).get_neighbour(3).assoc_data.set_field("weeee", "baaa")
-
-    print(n.get_all_chilren_and_data())
-
-    p = pickle.dumps(n)
-    print(p)
-
-    nn = pickle.loads(p)
-
-    print(nn.get_all_chilren_and_data())
+    v = NodeView(n, 0)
+    print(v.get_neighbour(2).get_neighbour(1).get_neighbour(1))

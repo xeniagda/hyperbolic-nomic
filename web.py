@@ -1,33 +1,33 @@
 import asyncio, json
 from aiohttp import web
 
-from hypertiling import OriginNode, TileGenerationContext
+from hypertiling import OriginNode, TileGenerationContext, NodeView
 
 WORLD = OriginNode(TileGenerationContext(0))
 WRITE_LOCK = asyncio.Lock()
 
-def render(tile, render_distance, visited=None):
-    if visited == None:
-        visited = set()
+def render(view, render_distance, seen_at=None):
+    if seen_at == None:
+        seen_at = {}
 
-    if tile.idx in visited:
-        return None
-
-    visited.add(tile.idx)
-
-    if not tile.is_available():
+    if view.node.idx in seen_at and seen_at[view.node.idx] > render_distance:
         return None
 
     if render_distance == 0:
         return None
 
+    seen_at[view.node.idx] = render_distance
+
+    # if not tile.is_available():
+    #     return None
+
     neighbours = []
     for i in range(7):
-        neighbours.append(render(tile.get_neighbour(i), render_distance - 1, visited))
+        neighbours.append(render(view.get_neighbour(i), render_distance - 1, seen_at))
 
     return {
-        "idx": tile.idx,
-        "assoc_data": tile.assoc_data.into_json_struct(),
+        "idx": view.node.idx,
+        "assoc_data": view.node.assoc_data.into_json_struct(),
         "neighbours": neighbours,
     }
 
@@ -54,7 +54,7 @@ async def tiles_around(req):
     if tile is None:
         return web.Response(text="no such idx", status=400)
 
-    data = render(tile, render_distance)
+    data = render(NodeView(tile, 0), render_distance)
 
     return web.Response(text=json.dumps(data))
 
