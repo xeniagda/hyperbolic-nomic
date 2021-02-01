@@ -43,10 +43,24 @@ function draw(idx, assoc_data, corners, center) {
         inner = document.getElementById(id + "-inner");
     }
     inner.innerHTML = "";
-    for (field in assoc_data) {
-        let text = document.createElement("p");
-        text.innerText = field;
-        inner.appendChild(text);
+    let fields = Object.keys(assoc_data);
+    fields.sort((a, b) => assoc_data[a].length - assoc_data[b].length);
+    for (field of fields) {
+        let data = document.createElement("div");
+        inner.appendChild(data);
+
+        let field_p = document.createElement("li");
+        field_p.innerText = field;
+        data.appendChild(field_p);
+
+        val = assoc_data[field];
+        if (val.length > 20) {
+            val = val.substring(0, 20);
+            val += "...";
+        }
+        let val_p = document.createElement("p");
+        val_p.innerText = val;
+        data.appendChild(val_p);
     }
 
     inner.classList.add("cell-inner");
