@@ -1,7 +1,10 @@
+import sys
 import asyncio, json, os, pickle
 from aiohttp import web
 import logging as lg
 from hypertiling import OriginNode, TileGenerationContext, NodeView
+
+sys.setrecursionlimit(200000)
 
 lg.basicConfig(
     format="[%(asctime)s — %(name)s — %(levelname)s] %(message)s",
