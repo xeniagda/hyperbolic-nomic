@@ -98,7 +98,6 @@ function draw(idx, assoc_data, corners, center) {
     // What way is the thing facing?
     let angle_rad = (math.pi * 2 + math.arg(math.sub(math.div(math.add(corners[0], corners[1]), 2), center))) % (2 * math.pi);
     let orientation = angle_rad / (2 * math.pi) * 7;
-    inner.innerText += "\n" + (0 | 10 * orientation) / 10;
 
     outer.onclick = e => {
         CURRENT_IDX = idx;
@@ -394,7 +393,7 @@ function rerender() {
         }
     }
     let fns = render(a, []);
-    requestAnimationFrame(() => { for (fn of fns) { fn() } });
+    setTimeout(() => { for (fn of fns) { fn() } }, 50);
 
     render_cell_data(a.assoc_data);
 
