@@ -9,7 +9,7 @@ WORLD_LOCK = asyncio.Lock()
 WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral", "coral")
 
 def render(view, render_distance, seen_at):
-    if view.node.idx in seen_at and seen_at[view.node.idx] > render_distance:
+    if view.node.idx in seen_at and seen_at[view.node.idx] >= render_distance:
         return None
 
     if render_distance <= 0:
@@ -66,7 +66,7 @@ async def tiles_around(req):
 
     seen_at = {}
     render(nodeview, render_distance, seen_at)
-    data = render(nodeview, render_distance, seen_at)
+    data = render(nodeview, render_distance, {a: b - 1 for a, b in seen_at.items()})
 
     return web.Response(text=json.dumps(data))
 
