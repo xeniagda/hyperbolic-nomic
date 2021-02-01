@@ -6,7 +6,7 @@ from hypertiling import OriginNode, TileGenerationContext, NodeView
 WORLD = OriginNode(TileGenerationContext(0))
 WORLD_LOCK = asyncio.Lock()
 
-WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral")
+WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral", "coral")
 
 def render(view, render_distance, seen_at):
     if view.node.idx in seen_at and seen_at[view.node.idx] > render_distance:
@@ -94,7 +94,7 @@ async def set_data(req):
         if tile is None:
             return web.Response(text="no such idx", status=400)
 
-        tile.assoc_data.set_field(prop, value)
+        tile.assoc_data.set_field(prop, value, author)
         # TODO: Save revision
 
     return web.Response(text="cool")
@@ -120,7 +120,7 @@ async def delete_data(req):
         if tile is None:
             return web.Response(text="no such idx", status=400)
 
-        tile.assoc_data.delete_field(prop)
+        tile.assoc_data.delete_field(prop, author)
         # TODO: Save revision
 
     return web.Response(text="cool")
