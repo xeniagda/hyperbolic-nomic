@@ -28,6 +28,7 @@ class FieldEdit(Delta):
         return {
             "type": "edit",
             "field": self.field,
+            "new_content": self.new_content,
             "author": self.author,
             "timestamp": timestamp_to_json(self.timestamp),
             "did_create": self.did_create,
