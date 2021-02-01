@@ -89,15 +89,16 @@ class TileData:
 
     def delete_field(self, field_name, author):
         if field_name not in self.get_fields():
-            return
+            return False
         self.field_history.append(FieldDeletion(field_name, author, now()))
         self.field_cache = None
+        return True
 
     def __str__(self):
-        return f"TileData({','.join(str(k) + '=' + str(v) for k, v in self.fields.items())})"
+        return f"TileData({','.join(str(k) + '=' + str(v) for k, v in self.get_fields().items())})"
 
     def __repr__(self):
-        return f"TileData({','.join(repr(k) + '=' + repr(v) for k, v in self.fields.items())})"
+        return f"TileData({','.join(repr(k) + '=' + repr(v) for k, v in self.get_fields().items())})"
 
     def into_json_struct(self):
         return self.get_fields()
