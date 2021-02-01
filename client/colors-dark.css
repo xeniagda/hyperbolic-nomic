@@ -1,0 +1,11 @@
+body {
+    --col-back-prim: #050510;
+    --col-back-sec: #100d2e;
+    --col-back-tri: #151030;
+    --col-neu-prim: #306986;
+    --col-neu-sec: #8888bb;
+    --col-high-prim: #2ab7aa;
+    --col-high-sec: #e0da55;
+
+    --text-color: #112244;
+}

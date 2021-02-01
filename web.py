@@ -164,9 +164,23 @@ if __name__ == "__main__":
         web.post("/api/delete_data", delete_data),
         web.get("/", lambda req: web.Response(status=301, headers={"Location": "index.html"})),
         web.get(
+            "/index.html",
+            lambda _: web.Response(
+                text = \
+                    open("client/index.html", "r")
+                    .read()
+                    .replace("TEMPLATE TEXT", " conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords "),
+                content_type="text/html",
+            )
+        ),
+        web.get(
             "/hidden-yes-very-secret.html",
             lambda _: web.Response(
-                text=open("client/index.html", "r").read(),
+                text = \
+                    open("client/index.html", "r")
+                    .read()
+                    .replace("colors-bright.css", "colors-dark.css")
+                    .replace("TEMPLATE TEXT", "welcome to hacker space 😎"),
                 content_type="text/html",
             )
         ),
