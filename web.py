@@ -64,11 +64,13 @@ async def tiles_around(req):
         nodeview = NodeView(tile, orientation)
 
 
-    seen_at = {}
-    render(nodeview, render_distance, seen_at)
-    data = render(nodeview, render_distance, {a: b - 1 for a, b in seen_at.items()})
+        seen_at = {}
+        render(nodeview, render_distance, seen_at)
+        rendered = render(nodeview, render_distance, {a: b - 1 for a, b in seen_at.items()})
 
-    return web.Response(text=json.dumps(data))
+        history = tile.assoc_data.detailed()
+
+    return web.Response(text=json.dumps({"rendered": rendered, "history": history}))
 
 async def set_data(req):
     if "idx" not in req.query:

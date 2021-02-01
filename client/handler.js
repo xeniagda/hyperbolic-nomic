@@ -390,8 +390,11 @@ function render_cell_data(data) {
 }
 
 var a;
+var current_history;
 async function refresh() {
-    a = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`)).json();
+    let resp = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`)).json();
+    a = resp.rendered;
+    current_history = resp.history;
 }
 
 function rerender() {

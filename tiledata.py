@@ -97,3 +97,6 @@ class TileData:
 
     def into_json_struct(self):
         return self.get_fields()
+
+    def detailed(self):
+        return [h.into_json_struct() for h in self.field_history]
