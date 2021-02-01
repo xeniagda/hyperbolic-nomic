@@ -400,6 +400,7 @@ function rerender() {
     let fns = render(a, []);
     setTimeout(() => { for (fn of fns) { fn() } }, 50);
 
+    document.getElementById("at-coords").innerText = "At tile " + a.idx;
     render_cell_data(a.assoc_data);
 
 }
