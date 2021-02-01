@@ -454,9 +454,15 @@ function render_cell_data(data) {
 var a;
 var current_history;
 async function refresh() {
-    let resp = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`)).json();
-    a = resp.rendered;
-    current_history = resp.history;
+    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`);
+    if (await resp.status === 400) {
+        status = await resp.text();
+        alert(`Error! Server says ${status} when trying to get the tiles`);
+    } else {
+        let data = await resp.json();
+        a = data.rendered;
+        current_history = data.history;
+    }
 }
 
 function rerender() {

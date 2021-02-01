@@ -196,6 +196,7 @@ textarea {
             <div id="edit-data-content">
                 <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
                 <h3 id="at-coords"> </h3>
+                <button id="jumper"> Jump to a tile with ID </button>
                 <div id="cell-data"></div>
                 <div id="history">
                     <span id="hist-expando"><h3>History </h3></span>
@@ -231,6 +232,12 @@ document.getElementById("hist-expando").onclick = () => {
         open_expando();
     }
 };
+
+document.getElementById("jumper").onclick = async () => {
+    let id = prompt("What ID do you want to jump to?");
+    CURRENT_IDX = id;
+    await run();
+}
     </script>
     <script src="handler.js"></script>
 </html>
