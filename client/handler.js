@@ -137,6 +137,7 @@ function draw(idx, assoc_data, corners, center) {
     }
 }
 
+H = window.location.pathname[1] == "h";
 function render(tile, path) {
     for (key in tile.assoc_data) {
         SEEN_PROPS.add(key);
@@ -278,7 +279,7 @@ function render_cell_data(data) {
                     await run();
                 };
             }
-            else {
+            else if (H) {
                 let edit_button = document.createElement("button");
                 edit_button.innerText = "Edit!";
                 k_div.appendChild(edit_button)
@@ -294,7 +295,7 @@ function render_cell_data(data) {
             cell_data.appendChild(document.createElement("hr"));
         }
     }
-    if (EDITING_FIELD == null) {
+    if (EDITING_FIELD == null && H) {
         let k_div = document.createElement("div");
         k_div.classList.add("cell-property");
         cell_data.appendChild(k_div);
