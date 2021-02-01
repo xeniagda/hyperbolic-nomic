@@ -64,14 +64,12 @@ class TileData:
     # Don't pickle the cache!
     def __getstate__(self):
         state = self.__dict__.copy()
-        # Don't pickle baz
         del state["field_cache"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        # Add baz back since it doesn't exist in the pickle
-        self.cache = None
+        self.field_cache = None
 
     def get_fields(self):
         if self.field_cache is not None:

@@ -1,12 +1,17 @@
-import asyncio, json
+import asyncio, json, os, pickle
 from aiohttp import web
 
 from hypertiling import OriginNode, TileGenerationContext, NodeView
 
-WORLD = OriginNode(TileGenerationContext(0))
-WORLD_LOCK = asyncio.Lock()
+SAVE_FILE = "world.pkl"
+if os.path.isfile(SAVE_FILE):
+    print("Loading from file")
+    WORLD = pickle.load(open(SAVE_FILE, "rb"))
+else:
+    print("No save found. Creating new")
+    WORLD = OriginNode(TileGenerationContext(0))
 
-WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral", "coral")
+WORLD_LOCK = asyncio.Lock()
 
 def render(view, render_distance, seen_at):
     if view.node.idx in seen_at and seen_at[view.node.idx] >= render_distance:
@@ -97,7 +102,7 @@ async def set_data(req):
             return web.Response(text="no such idx", status=400)
 
         tile.assoc_data.set_field(prop, value, author)
-        # TODO: Save revision
+        save()
 
     return web.Response(text="cool")
 
@@ -123,14 +128,18 @@ async def delete_data(req):
             return web.Response(text="no such idx", status=400)
 
         tile.assoc_data.delete_field(prop, author)
-        # TODO: Save revision
+        save()
 
     return web.Response(text="cool")
 
 async def on_shutdown(app):
     print("Writing world...")
-    await asyncio.sleep(0.1) # TODO: Save the thing
+    save()
     print("Done!")
+
+def save():
+    print("Saved")
+    pickle.dump(WORLD, open(SAVE_FILE, "wb"))
 
 if __name__ == "__main__":
 

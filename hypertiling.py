@@ -41,14 +41,12 @@ class Tile(ABC):
     # Don't pickle the cache!
     def __getstate__(self):
         state = self.__dict__.copy()
-        # Don't pickle baz
         del state["cache"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
-        # Add baz back since it doesn't exist in the pickle
-        self.cache = [(None, None) for _ in range(7)]
+        self.cache = [None for _ in range(7)]
 
     def get_all_chilren_and_data(self):
         out = []
