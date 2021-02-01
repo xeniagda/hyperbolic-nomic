@@ -34,7 +34,6 @@ class Tile(ABC):
         self.gctx = gctx
         self.cache = [None for _ in range(7)]
         self.idx = TileGenerationContext.TILE_CTR
-        print(self.idx)
         TileGenerationContext.TILE_CTR += 1
         self.assoc_data = TileData()
 
