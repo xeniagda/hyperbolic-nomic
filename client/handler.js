@@ -47,6 +47,8 @@ function draw(idx, assoc_data, corners, center) {
     inner.classList.add("cell-inner");
     if (Object.keys(assoc_data).length > 0) {
         inner.classList.add("has-data");
+    } else {
+        inner.classList.remove("has-data");
     }
     if (CURRENT_IDX == idx) {
         outer.classList.add("active");
@@ -185,10 +187,38 @@ function render_cell_data(data) {
                 auth_lab.appendChild(author_text);
                 author_text.oninput = () => { document.getElementById("author").classList.remove("danger"); };
 
+                let cancel_button = document.createElement("button");
+                cancel_button.innerText = "Cancel";
+                k_div.appendChild(cancel_button)
+                cancel_button.onclick = async () => {
+                    EDITING_FIELD = null;
+                    await run();
+                };
+
                 let delete_button = document.createElement("button");
                 delete_button.innerText = "Delete me.";
                 delete_button.classList.add("danger");
                 k_div.appendChild(delete_button)
+                delete_button.onclick = async () => {
+                    let name = document.getElementById("author").value;
+                    if (name === "") {
+                        document.getElementById("author").classList.add("danger");
+                        return;
+                    }
+                    if (!confirm("Are you sure you want to delete " + k + "?")) {
+                        return;
+                    }
+                    let data = {"prop": k, "author": name};
+                    await fetch(`/api/delete_data?idx=${CURRENT_IDX}`, {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    EDITING_FIELD = null;
+                    await run();
+                };
 
                 let submit_button = document.createElement("button");
                 submit_button.innerText = "Submit";
@@ -200,7 +230,15 @@ function render_cell_data(data) {
                         document.getElementById("author").classList.add("danger");
                         return;
                     }
-                    // TODO: do post
+                    let value = document.getElementById(id).value;
+                    let data = {"prop": k, "value": value, "author": name};
+                    await fetch(`/api/set_data?idx=${CURRENT_IDX}`, {
+                        method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
                     EDITING_FIELD = null;
                     await run();
                 };
@@ -221,7 +259,6 @@ function render_cell_data(data) {
             cell_data.appendChild(document.createElement("hr"));
         }
     }
-
 }
 
 async function run() {

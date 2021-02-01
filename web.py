@@ -4,7 +4,7 @@ from aiohttp import web
 from hypertiling import OriginNode, TileGenerationContext, NodeView
 
 WORLD = OriginNode(TileGenerationContext(0))
-WRITE_LOCK = asyncio.Lock()
+WORLD_LOCK = asyncio.Lock()
 
 WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral")
 
@@ -57,10 +57,11 @@ async def tiles_around(req):
         if orientation > 7:
             return web.Response(text="render distance too large", status=400)
 
-    tile = WORLD.get_child_with_idx(idx)
-    if tile is None:
-        return web.Response(text="no such idx", status=400)
-    nodeview = NodeView(tile, orientation)
+    async with WORLD_LOCK:
+        tile = WORLD.get_child_with_idx(idx)
+        if tile is None:
+            return web.Response(text="no such idx", status=400)
+        nodeview = NodeView(tile, orientation)
 
 
     seen_at = {}
@@ -68,6 +69,61 @@ async def tiles_around(req):
     data = render(nodeview, render_distance, seen_at)
 
     return web.Response(text=json.dumps(data))
+
+async def set_data(req):
+    if "idx" not in req.query:
+        return web.Response(text="no idx", status=400)
+    try:
+        idx = int(req.query["idx"])
+    except ValueError as e:
+        return web.Response(text="malformed idx", status=400)
+
+    data = await req.json()
+    if "prop" not in data:
+        return web.Response(text="no prop", status=400)
+    prop = data["prop"]
+    if "value" not in data:
+        return web.Response(text="no value", status=400)
+    value = data["value"]
+    if "author" not in data:
+        return web.Response(text="no author", status=400)
+    author = data["author"]
+
+    async with WORLD_LOCK:
+        tile = WORLD.get_child_with_idx(idx)
+        if tile is None:
+            return web.Response(text="no such idx", status=400)
+
+        tile.assoc_data.set_field(prop, value)
+        # TODO: Save revision
+
+    return web.Response(text="cool")
+
+async def delete_data(req):
+    if "idx" not in req.query:
+        return web.Response(text="no idx", status=400)
+    try:
+        idx = int(req.query["idx"])
+    except ValueError as e:
+        return web.Response(text="malformed idx", status=400)
+
+    data = await req.json()
+    if "prop" not in data:
+        return web.Response(text="no prop", status=400)
+    prop = data["prop"]
+    if "author" not in data:
+        return web.Response(text="no author", status=400)
+    author = data["author"]
+
+    async with WORLD_LOCK:
+        tile = WORLD.get_child_with_idx(idx)
+        if tile is None:
+            return web.Response(text="no such idx", status=400)
+
+        tile.assoc_data.delete_field(prop)
+        # TODO: Save revision
+
+    return web.Response(text="cool")
 
 async def on_shutdown(app):
     print("Writing world...")
@@ -80,6 +136,8 @@ if __name__ == "__main__":
 
     app.add_routes([
         web.get("/api/tiles", tiles_around),
+        web.post("/api/set_data", set_data),
+        web.post("/api/delete_data", delete_data),
         web.get("/", lambda req: web.Response(status=301, headers={"Location": "index.html"})),
         web.static("/", "client"),
     ])
