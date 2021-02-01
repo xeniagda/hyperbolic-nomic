@@ -7,10 +7,18 @@
 body {
     display: flex;
     flex-direction: row;
+    height: 100vh;
+    margin: 0;
+}
+#outer-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
     justify-content: center;
 }
 #container {
     position: absolute;
+    margin-top: 2em;
     width: 50%;
     background-color: #eeeeee;
     box-shadow: 0px 0px 5px #888888;
@@ -46,26 +54,71 @@ body {
     background: #ffbb00;
 }
 
-#p1-1 {
-    top: 50px;
-    left: 50px;
-    width: 50px;
-    height: 50px;
+#edit-data {
+    position: relative;
+    height: 100%;
+    width: 40%;
+    left: -40%;
+    background: #bbeebb;
+    transition: left 0.6s ease-out;
+    padding: 1em;
+    padding-top: 5em;
 }
 
-#p1-1-m1 {
-    clip-path: ellipse(100% 100% at 50% 100%);
+#edit-data.open {
+    left: 0%;
 }
 
-#p1-1-m2 {
-    clip-path: ellipse(100% 100% at 50% 0%);
+#collapser::before {
+    content: ">>>";
+}
+#collapser {
+    position: absolute;
+    top: 0;
+    width: 3em;
+    right: calc(-2em - 40%);
+    text-align: center;
+    padding: 1em;
+
+    border-radius: 0em 1em 1em 0em;
+    border-width: 2px 2px 2px 0px;
+    border-color: #888888;
+    border-style: solid;
+    background: white;
+
+    transition: right 0.8s, width 0.8s;
+
+    filter: drop-shadow(-0px 0px 3px #888888);
+}
+
+#edit-data.open > #collapser::before {
+    content: "<<<";
+}
+#edit-data.open > #collapser {
+    border-radius: 1em 0em 0em 1em;
+    border-width: 2px 2px 2px 2px;
+    right: 0px;
+    width: 100%;
+    transition: right 0.2s, width 0.2s;
 }
 
         </style>
     </head>
     <body>
-        <div id="container">
+        <div id="edit-data">
+            <span id="collapser">
+            </span>
+            <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
+        </div>
+        <div id="outer-container">
+            <div id="container">
+            </div>
         </div>
     </body>
+    <script>
+document.getElementById("collapser").onclick = () => {
+    document.getElementById("edit-data").classList.toggle("open");
+};
+    </script>
     <script src="handler.js"></script>
 </html>
