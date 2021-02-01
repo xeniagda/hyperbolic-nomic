@@ -1,14 +1,19 @@
 import asyncio, json, os, pickle
 from aiohttp import web
-
+import logging as lg
 from hypertiling import OriginNode, TileGenerationContext, NodeView
+
+lg.basicConfig(
+    format="[%(asctime)s — %(name)s — %(levelname)s] %(message)s",
+    level=lg.INFO
+)
 
 SAVE_FILE = "world.pkl"
 if os.path.isfile(SAVE_FILE):
-    print("Loading from file")
+    lg.info("Loading from file")
     WORLD = pickle.load(open(SAVE_FILE, "rb"))
 else:
-    print("No save found. Creating new")
+    lg.info("No save found. Creating new")
     WORLD = OriginNode(TileGenerationContext(0))
 
 WORLD_LOCK = asyncio.Lock()
@@ -96,6 +101,9 @@ async def set_data(req):
         return web.Response(text="no author", status=400)
     author = data["author"]
 
+    lgval = repr(value) if len(value) < 40 else repr(value[:40]) + "..."
+    lg.info(f"{author} changing {prop} to {lgval} at {idx}")
+
     async with WORLD_LOCK:
         tile = WORLD.get_child_with_idx(idx)
         if tile is None:
@@ -122,24 +130,28 @@ async def delete_data(req):
         return web.Response(text="no author", status=400)
     author = data["author"]
 
+    lg.info(f"{author} deleting {prop} at {idx}")
     async with WORLD_LOCK:
         tile = WORLD.get_child_with_idx(idx)
         if tile is None:
             return web.Response(text="no such idx", status=400)
 
-        tile.assoc_data.delete_field(prop, author)
+        if not tile.assoc_data.delete_field(prop, author):
+            lg.warning(f"Already deleted!")
         save()
 
     return web.Response(text="cool")
 
 async def on_shutdown(app):
-    print("Writing world...")
+    lg.info("Writing world...")
     save()
-    print("Done!")
+    lg.info("Done!")
 
 def save():
-    print("Saved")
-    pickle.dump(WORLD, open(SAVE_FILE, "wb"))
+    with open(SAVE_FILE, "wb") as f:
+        data = pickle.dumps(WORLD)
+        f.write(data)
+    lg.info(f"Saved {len(data)} bytes.")
 
 if __name__ == "__main__":
 
@@ -154,4 +166,4 @@ if __name__ == "__main__":
     ])
     app.on_shutdown.append(on_shutdown)
 
-    web.run_app(app, port=9080)
+    web.run_app(app, port=9080, access_log=None)
