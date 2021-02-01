@@ -120,6 +120,9 @@ function draw(idx, assoc_data, corners, center) {
 }
 
 function render(tile, path) {
+    for (key in tile.assoc_data) {
+        SEEN_PROPS.add(key);
+    }
     let fns = [];
     let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
     corners = reorient(corners, tile.orientation);
@@ -143,6 +146,7 @@ function get_all_ids(tile) {
     return ids;
 }
 
+SEEN_PROPS = new Set();
 EDITING_FIELD = null;
 
 function render_cell_data(data) {
