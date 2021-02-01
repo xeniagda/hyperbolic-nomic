@@ -88,6 +88,8 @@ class TileData:
         self.field_cache = None
 
     def delete_field(self, field_name, author):
+        if field_name not in self.get_fields():
+            return
         self.field_history.append(FieldDeletion(field_name, author, now()))
         self.field_cache = None
 
