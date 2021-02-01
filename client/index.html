@@ -17,6 +17,9 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    background: white;
+    box-shadow: 0px 0px 20px #ffffff;
+    z-index: 1;
 }
 #container {
     position: absolute;
@@ -74,15 +77,16 @@ body {
 #edit-data {
     position: relative;
     height: 100%;
-    width: 40%;
-    left: -40%;
-    background: #bbeebb;
-    transition: left 0.6s ease-out;
+    width: 0%;
+    background: white;
+    transition: width 0.6s, background 0.6s;
     box-sizing: border-box;
 }
 
 #edit-data.open {
-    left: 0%;
+    width: 40%;
+    opacity: 100%;
+    background: #bbbbee;
 }
 
 #edit-data-content {
@@ -98,9 +102,7 @@ body {
 }
 #collapser {
     position: absolute;
-    top: 0;
-    width: 3em;
-    right: calc(-4em - 40%);
+    width: 5em;
     text-align: center;
     padding: 1em;
 
@@ -110,20 +112,20 @@ body {
     border-style: solid;
     background: white;
 
-    transition: right 0.8s, width 0.8s;
+    transition: width 0.6s, border-radius 0.6s;
 
     filter: drop-shadow(-0px 0px 3px #888888);
+    z-index: 2;
+    box-sizing: border-box;
 }
 
 #edit-data.open > #collapser::before {
     content: "<<<";
 }
 #edit-data.open > #collapser {
-    border-radius: 1em 0em 0em 1em;
+    border-radius: 0em 0em 1em 1em;
     border-width: 2px 2px 2px 2px;
-    right: 0px;
     width: 100%;
-    transition: right 0.2s, width 0.2s;
 }
 
 .cell-property > label, textarea {
