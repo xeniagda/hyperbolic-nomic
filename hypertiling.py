@@ -140,21 +140,22 @@ class MajorNode(Tile):
             return self.children[c], 0
 
         if i == 1:
-            return self.parent.get_neighbour(self.parent_idx - 1)[0], 6
+            n, e = self.parent.get_neighbour(self.parent_idx - 1)
+            return n, (e - 1) % 7
 
         if i == 5:
             neighbour_parent = self.get_neighbour(6)[0]
             if isinstance(neighbour_parent, MajorNode):
-                return neighbour_parent.get_neighbour(2)[0], 1
-            else:
-                return neighbour_parent.get_neighbour(3)[0], 1
-
-        if i == 6:
-            n = self.parent.get_neighbour(self.parent_idx + 1)[0]
-            if isinstance(n, MajorNode):
+                n = neighbour_parent.get_neighbour(2)[0]
                 return n, 1
             else:
-                return n, 2
+                n = neighbour_parent.get_neighbour(3)[0]
+                assert(isinstance(n, MinorNode))
+                return n, 1
+
+        if i == 6:
+            n, e = self.parent.get_neighbour(self.parent_idx + 1)
+            return n, (e + 1) % 7
 
 
 class MinorNode(Tile):
@@ -186,7 +187,8 @@ class MinorNode(Tile):
             return self.children[c], 0
 
         if i == 1:
-            return self.parent.get_neighbour(self.parent_idx - 1)[0], 5
+            n, e = self.parent.get_neighbour(self.parent_idx - 1)
+            return n, (e - 1) % 7
 
         if i == 2:
             neighbour_parent = self.get_neighbour(1)[0]
@@ -200,7 +202,8 @@ class MinorNode(Tile):
                 return neighbour_parent.get_neighbour(3)[0], 1
 
         if i == 6:
-            return self.parent.get_neighbour(self.parent_idx + 1)[0], 2
+            n, e = self.parent.get_neighbour(self.parent_idx + 1)
+            return n, (e + 1) % 7
 
 class NodeView:
     def __init__(self, node, orientation):
