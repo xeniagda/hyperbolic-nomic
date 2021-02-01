@@ -279,12 +279,14 @@ function render_cell_data(data) {
                     await run();
                 };
             }
-            else if (H) {
-                let edit_button = document.createElement("button");
-                edit_button.innerText = "Edit!";
-                k_div.appendChild(edit_button)
+            else {
+                if (H) {
+                    let edit_button = document.createElement("button");
+                    edit_button.innerText = "Edit!";
+                    k_div.appendChild(edit_button)
 
-                edit_button.onclick = () => { EDITING_FIELD = k; render_cell_data(data); };
+                    edit_button.onclick = () => { EDITING_FIELD = k; render_cell_data(data); };
+                }
 
                 let data = document.createElement("p");
                 data.id = id;
