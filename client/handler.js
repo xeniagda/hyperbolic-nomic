@@ -181,7 +181,7 @@ function render_cell_data(data) {
 
         let keys = Object.keys(a.assoc_data);
         keys.sort();
-        for (k of keys) {
+        for (let k of keys) {
             let v = a.assoc_data[k];
             let id = encodeURIComponent(k);
 
