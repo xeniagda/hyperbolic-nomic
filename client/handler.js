@@ -390,8 +390,8 @@ function render_cell_data(data) {
     let hist = document.getElementById("history-content");
     hist.innerHTML = "";
     close_expando();
+    let seen = new Set();
     if (current_history.length > 0) {
-        var is_first = true;
         for (change of current_history) {
             console.log(change);
             let item = document.createElement("div");
@@ -415,7 +415,7 @@ function render_cell_data(data) {
             if (change.type == "edit") {
                 header.innerText = `At ${change.timestamp} by ${change.author}:`;
                 if (change.did_create) {
-                    if (!is_first) {
+                    if (seen.has(change.field)) {
                         header.innerText += " recreated"
                     } else {
                         header.innerText += " created"
@@ -429,7 +429,7 @@ function render_cell_data(data) {
             } else {
                 header.innerText = `At ${change.timestamp} by ${change.author}: deleted ${change.field}`;
             }
-            is_first = false;
+            seen.add(change.field);
         }
     }
 }
