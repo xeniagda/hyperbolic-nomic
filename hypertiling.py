@@ -36,16 +36,19 @@ class Tile(ABC):
         self.idx = TileGenerationContext.TILE_CTR
         TileGenerationContext.TILE_CTR += 1
         self.assoc_data = TileData()
+        self.all_children_idx_cache = set() # May not be 100% correct, just for heuristics
 
     # Don't pickle the cache!
     def __getstate__(self):
         state = self.__dict__.copy()
         del state["cache"]
+        del state["all_children_idx_cache"]
         return state
 
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.cache = [None for _ in range(7)]
+        self.all_children_idx_cache = set()
 
     def get_all_chilren_and_data(self):
         out = []
@@ -60,13 +63,27 @@ class Tile(ABC):
         if self.idx == idx:
             return self
 
+        # First pass: only check children who think they contain the idx
+        for ch in self.children:
+            if ch is None:
+                continue
+            if idx in ch.all_children_idx_cache:
+                chid = ch.get_child_with_idx(idx)
+                if chid is not None:
+                    self.all_children_idx_cache.add(idx)
+                    return chid
+
+        # Second pass, check all children
         for ch in self.children:
             if ch is None:
                 continue
             chid = ch.get_child_with_idx(idx)
             if chid is not None:
+                self.all_children_idx_cache.add(idx)
                 return chid
 
+        if idx in self.all_children_idx_cache:
+            self.all_children_idx_cache.remove(idx)
         return None
 
     def __str__(self):
