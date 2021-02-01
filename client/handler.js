@@ -413,14 +413,16 @@ function render_cell_data(data) {
             item.appendChild(content);
 
             if (change.type == "edit") {
-                header.innerText = `At ${change.timestamp} by ${change.author}: `;
+                header.innerText = `At ${change.timestamp} by ${change.author}:`;
                 if (change.did_create) {
                     if (!is_first) {
-                        header.innerText += "re"
+                        header.innerText += " recreated"
+                    } else {
+                        header.innerText += " created"
                     }
-                    header.innerText += `created ${change.field}`;
+                    header.innerText += ` ${change.field}`;
                 } else {
-                    header.innerText += `changed ${change.field}`;
+                    header.innerText += ` changed ${change.field}`;
                 }
 
                 content.innerText = change.new_content;
