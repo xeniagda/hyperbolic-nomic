@@ -127,11 +127,11 @@ body {
 .cell-property > label, textarea {
     display: block;
 }
-.cell-property .prop-name {
+.prop-name {
     font-weight: bold;
     margin-bottom: 0.5em;
 }
-.cell-property .prop-data {
+.prop-data {
     margin-top: 0.5em;
     margin-left: 0.5em;
     padding-left: 0.5em;
@@ -155,6 +155,35 @@ textarea {
     white-space: pre;
 }
 
+#history {
+    flex-direction: column;
+}
+
+#history-content {
+    overflow-y: hidden;
+    transition: height 0.6s;
+}
+
+#hist-expando {
+    cursor: pointer;
+}
+
+#history > #hist-expando > h3::after {
+    content: ">";
+}
+#history.active > #hist-expando > h3::after {
+    content: "v";
+}
+
+.history-heading {
+    cursor: pointer;
+}
+
+.prop-history {
+    overflow-y: hidden;
+    transition: height 0.6s;
+}
+
         </style>
     </head>
     <body>
@@ -164,6 +193,15 @@ textarea {
                 <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
                 <h3 id="at-coords"> </h3>
                 <div id="cell-data"></div>
+                <div id="history">
+                    <span id="hist-expando"><h3>History </h3></span>
+                    <div id="history-content" style="height: 0">
+                        <div class="hist-item">
+                            <p>At 13:05 by coral: Change Players Here to</p>
+                            <p class="prop-data">aaaaa</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div id="outer-container">
@@ -174,6 +212,24 @@ textarea {
     <script>
 document.getElementById("collapser").onclick = () => {
     document.getElementById("edit-data").classList.toggle("open");
+};
+
+function close_expando() {
+    document.getElementById("history-content").style.height = 0;
+    document.getElementById("history").classList.remove("active");
+}
+
+function open_expando() {
+    document.getElementById("history-content").style.height = document.getElementById("history-content").scrollHeight;
+    document.getElementById("history").classList.add("active");
+}
+
+document.getElementById("hist-expando").onclick = () => {
+    if (document.getElementById("history").classList.contains("active")) {
+        close_expando();
+    } else {
+        open_expando();
+    }
 };
     </script>
     <script src="handler.js"></script>

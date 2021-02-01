@@ -387,6 +387,49 @@ function render_cell_data(data) {
             };
         }
     }
+    let hist = document.getElementById("history-content");
+    hist.innerHTML = "";
+    close_expando();
+    if (current_history.length > 0) {
+        var is_first = true;
+        for (change of current_history) {
+            console.log(change);
+            let item = document.createElement("div");
+            item.classList.add("hist-item");
+            hist.appendChild(item);
+
+            let header = document.createElement("h4");
+            header.classList.add("history-heading");
+            item.appendChild(header);
+
+            let content = document.createElement("p");
+            content.classList.add("prop-data");
+            content.classList.add("prop-history");
+            content.style.height = 0;
+            header.onclick = () => {
+                content.style.height = content.scrollHeight;
+                document.getElementById("history-content").style.height = "max-content";
+            };
+            item.appendChild(content);
+
+            if (change.type == "edit") {
+                header.innerText = `At ${change.timestamp} by ${change.author}: `;
+                if (change.did_create) {
+                    if (!is_first) {
+                        header.innerText += "re"
+                    }
+                    header.innerText += `created ${change.field}`;
+                } else {
+                    header.innerText += `changed ${change.field}`;
+                }
+
+                content.innerText = change.new_content;
+            } else {
+                header.innerText = `At ${change.timestamp} by ${change.author}: deleted ${change.field}`;
+            }
+            is_first = false;
+        }
+    }
 }
 
 var a;
