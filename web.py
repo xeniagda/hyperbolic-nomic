@@ -162,6 +162,13 @@ if __name__ == "__main__":
         web.post("/api/set_data", set_data),
         web.post("/api/delete_data", delete_data),
         web.get("/", lambda req: web.Response(status=301, headers={"Location": "index.html"})),
+        web.get(
+            "/hidden-yes-very-secret.html",
+            lambda _: web.Response(
+                text=open("client/index.html", "r").read(),
+                content_type="text/html",
+            )
+        ),
         web.static("/", "client"),
     ])
     app.on_shutdown.append(on_shutdown)
