@@ -46,6 +46,10 @@ body {
     transition: background-color 0.5s, clip-path 0.5s;
     text-align: center;
 }
+.cell-inner.has-data {
+    background: #bbbbbb;
+
+}
 
 .active {
     --col-shadow: #bb8800;
@@ -102,6 +106,30 @@ body {
     transition: right 0.2s, width 0.2s;
 }
 
+.cell-property > label, textarea {
+    display: block;
+}
+.cell-property .prop-name {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+.cell-property .prop-data {
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    padding-left: 0.5em;
+    border-left: 2px solid gray;
+}
+
+.cell-property textarea {
+    width: 100%;
+    min-height: 5em;
+    resize: vertical;
+}
+
+.danger {
+    background: red;
+}
+
         </style>
     </head>
     <body>
@@ -109,6 +137,7 @@ body {
             <span id="collapser">
             </span>
             <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
+            <div id="cell-data"></div>
         </div>
         <div id="outer-container">
             <div id="container">
