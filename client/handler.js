@@ -196,7 +196,7 @@ function render_cell_data(data) {
                 k_div.appendChild(cancel_button)
                 cancel_button.onclick = async () => {
                     EDITING_FIELD = null;
-                    await run();
+                    rerender();
                 };
 
                 let delete_button = document.createElement("button");
@@ -265,9 +265,12 @@ function render_cell_data(data) {
     }
 }
 
-async function run() {
+var a;
+async function refresh() {
     a = await (await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`)).json();
+}
 
+function rerender() {
     let to_render = get_all_ids(a);
     for (elem of Array.from(document.getElementsByClassName("cell-outer"))) {
         let idx = 0 | elem.dataset.idx;
@@ -286,5 +289,12 @@ async function run() {
     requestAnimationFrame(() => { for (fn of fns) { fn() } });
 
     render_cell_data(a.assoc_data);
+
 }
+
+async function run() {
+    await refresh();
+    rerender();
+}
+
 run();
