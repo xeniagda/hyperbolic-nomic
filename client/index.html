@@ -65,12 +65,19 @@ body {
     left: -40%;
     background: #bbeebb;
     transition: left 0.6s ease-out;
-    padding: 1em;
-    padding-top: 5em;
+    box-sizing: border-box;
 }
 
 #edit-data.open {
     left: 0%;
+}
+
+#edit-data-content {
+    overflow-y: scroll;
+    height: 100%;
+    padding: 1em;
+    padding-top: 3em;
+    box-sizing: border-box;
 }
 
 #collapser::before {
@@ -80,7 +87,7 @@ body {
     position: absolute;
     top: 0;
     width: 3em;
-    right: calc(-2em - 40%);
+    right: calc(-4em - 40%);
     text-align: center;
     padding: 1em;
 
@@ -141,10 +148,11 @@ textarea {
     </head>
     <body>
         <div id="edit-data">
-            <span id="collapser">
-            </span>
-            <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
-            <div id="cell-data"></div>
+            <span id="collapser"> </span>
+            <div id="edit-data-content">
+                <h2> conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords </h2>
+                <div id="cell-data"></div>
+            </div>
         </div>
         <div id="outer-container">
             <div id="container">
