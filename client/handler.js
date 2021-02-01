@@ -58,9 +58,14 @@ function draw(idx, corners, center) {
         mini = Math.min(mini, co.im);
         maxi = Math.max(maxi, co.im);
     }
+    outer.dataset.fade_x = prec(((mini + maxi) * 1.2 + 2) / 4);
+    outer.dataset.fade_y = prec(((minr + maxr) * 1.2 + 2) / 4);
+
     if (is_new) {
         outer.style.width = 0;
         outer.style.height = 0;
+        outer.style.left = outer.dataset.fade_x;
+        outer.style.top = outer.dataset.fade_y;
     } else {
         outer.style.left = prec((mini + 1) / 2);
         outer.style.top = prec((minr + 1) / 2);
@@ -104,6 +109,7 @@ function draw(idx, corners, center) {
             outer.style.top = prec((minr + 1) / 2);
             outer.style.width = prec((maxi - mini) / 2);
             outer.style.height = prec((maxr - minr) / 2);
+            outer.style.opacity = "100%";
         };
     } else {
         return () => {};
@@ -146,7 +152,8 @@ async function run() {
             } else {
                 elem.style.width = 0;
                 elem.style.height = 0;
-
+                elem.style.left = elem.dataset.fade_x;
+                elem.style.top = elem.dataset.fade_y;
             }
         }
     }
