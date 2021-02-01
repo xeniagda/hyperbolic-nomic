@@ -12,6 +12,7 @@ SAVE_FILE = "world.pkl"
 if os.path.isfile(SAVE_FILE):
     lg.info("Loading from file")
     WORLD = pickle.load(open(SAVE_FILE, "rb"))
+    TileGenerationContext.TILE_CTR = WORLD.get_higest_idx() + 1
 else:
     lg.info("No save found. Creating new")
     WORLD = OriginNode(TileGenerationContext(0))

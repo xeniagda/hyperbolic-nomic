@@ -22,20 +22,20 @@ from copy import deepcopy
 from tiledata import TileData
 import pickle
 
-TILE_CTR = 0
-
 
 class TileGenerationContext:
     def __init__(self, n_steps_out):
         self.n_steps_out = n_steps_out
 
+    TILE_CTR = 0
+
 class Tile(ABC):
     def __init__(self, gctx):
-        global TILE_CTR
         self.gctx = gctx
         self.cache = [None for _ in range(7)]
-        self.idx = TILE_CTR
-        TILE_CTR += 1
+        self.idx = TileGenerationContext.TILE_CTR
+        print(self.idx)
+        TileGenerationContext.TILE_CTR += 1
         self.assoc_data = TileData()
 
     # Don't pickle the cache!
@@ -94,6 +94,9 @@ class Tile(ABC):
 
     def is_available(self):
         return self.gctx.n_steps_out <= 4
+
+    def get_higest_idx(self):
+        return max([self.idx] + [a.get_higest_idx() for a in self.children if a is not None])
 
 class OriginNode(Tile):
     def __init__(self, gctx):
