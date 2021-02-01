@@ -45,7 +45,18 @@ body {
     background: white;
     transition: background-color 0.5s, clip-path 0.5s;
     text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    overflow: hidden;
 }
+.cell-inner p {
+    white-space: pre;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
 .cell-inner.has-data {
     background: #bbbbbb;
 

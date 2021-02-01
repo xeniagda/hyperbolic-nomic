@@ -42,7 +42,12 @@ function draw(idx, assoc_data, corners, center) {
     } else {
         inner = document.getElementById(id + "-inner");
     }
-    inner.innerText = idx;
+    inner.innerHTML = "";
+    for (field in assoc_data) {
+        let text = document.createElement("p");
+        text.innerText = field;
+        inner.appendChild(text);
+    }
 
     inner.classList.add("cell-inner");
     if (Object.keys(assoc_data).length > 0) {
