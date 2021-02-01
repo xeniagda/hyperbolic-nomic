@@ -102,7 +102,7 @@ async def set_data(req):
     author = data["author"]
 
     lgval = repr(value) if len(value) < 40 else repr(value[:40]) + "..."
-    lg.info(f"{author} changing {prop} to {lgval} at {idx}")
+    lg.info(f"{author} ({req.address}) changing {prop} to {lgval} at {idx}")
 
     async with WORLD_LOCK:
         tile = WORLD.get_child_with_idx(idx)
@@ -130,7 +130,7 @@ async def delete_data(req):
         return web.Response(text="no author", status=400)
     author = data["author"]
 
-    lg.info(f"{author} deleting {prop} at {idx}")
+    lg.info(f"{author} ({req.address}) deleting {prop} at {idx}")
     async with WORLD_LOCK:
         tile = WORLD.get_child_with_idx(idx)
         if tile is None:
