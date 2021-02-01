@@ -6,6 +6,8 @@ from hypertiling import OriginNode, TileGenerationContext, NodeView
 WORLD = OriginNode(TileGenerationContext(0))
 WRITE_LOCK = asyncio.Lock()
 
+WORLD.get_neighbour(0)[0].get_neighbour(3)[0].assoc_data.set_field("Players here", "coral")
+
 def render(view, render_distance, seen_at):
     if view.node.idx in seen_at and seen_at[view.node.idx] > render_distance:
         return None
