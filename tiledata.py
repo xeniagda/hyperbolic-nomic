@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
-import time
+from datetime import datetime, timezone
+
+def now():
+    return datetime.now(tz=timezone.utc)
 
 def timestamp_to_json(ts):
-    return "aaaaa"
+    return ts.strftime("%Y-%m-%d %H:%M UTC")
 
 class Delta(ABC):
     def __init__(self, field, author, timestamp):
@@ -83,11 +86,11 @@ class TileData:
 
     def set_field(self, field_name, value, author):
         did_create = field_name not in self.get_fields()
-        self.field_history.append(FieldEdit(field_name, value, did_create, author, time.time()))
+        self.field_history.append(FieldEdit(field_name, value, did_create, author, now()))
         self.field_cache = None
 
     def delete_field(self, field_name, author):
-        self.field_history.append(FieldDeletion(field_name, author, time.time()))
+        self.field_history.append(FieldDeletion(field_name, author, now()))
         self.field_cache = None
 
     def __str__(self):
