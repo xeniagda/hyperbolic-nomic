@@ -200,7 +200,13 @@ function render_cell_data(data) {
                 author_text.type = "text";
                 author_text.id = "author";
                 auth_lab.appendChild(author_text);
-                author_text.oninput = () => { document.getElementById("author").classList.remove("danger"); };
+                author_text.oninput = e => {
+                    document.getElementById("author").classList.remove("danger");
+                    window.localStorage.setItem("author", e.target.value);
+                };
+                if (window.localStorage.getItem("author") !== null) {
+                    author_text.value = window.localStorage.getItem("author");
+                }
 
                 let cancel_button = document.createElement("button");
                 cancel_button.innerText = "Cancel";
@@ -329,7 +335,13 @@ function render_cell_data(data) {
             author_text.type = "text";
             author_text.id = "author";
             auth_lab.appendChild(author_text);
-            author_text.oninput = () => { document.getElementById("author").classList.remove("danger"); };
+            author_text.oninput = e => {
+                document.getElementById("author").classList.remove("danger");
+                window.localStorage.setItem("author", e.target.value);
+            };
+            if (window.localStorage.getItem("author") !== null) {
+                author_text.value = window.localStorage.getItem("author");
+            }
 
             let cancel_button = document.createElement("button");
             cancel_button.innerText = "Cancel";
