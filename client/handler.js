@@ -150,6 +150,13 @@ SEEN_PROPS = new Set();
 EDITING_FIELD = null;
 
 function render_cell_data(data) {
+    let current_selected;
+    if (document.getElementById("prop-name") !== null) {
+        current_selected = document.getElementById("prop-name").selectedIndex;
+    } else {
+        current_selected = 0;
+    }
+
     let cell_data = document.getElementById("cell-data");
     cell_data.innerHTML = "";
     if (Object.keys(a.assoc_data).length > 0) {
@@ -261,6 +268,107 @@ function render_cell_data(data) {
                 label.appendChild(data);
             }
             cell_data.appendChild(document.createElement("hr"));
+        }
+    }
+    if (EDITING_FIELD == null) {
+        let k_div = document.createElement("div");
+        k_div.classList.add("cell-property");
+        cell_data.appendChild(k_div);
+
+        let outer_label = document.createElement("label");
+        outer_label.id = "new-prop";
+        outer_label.htmlFor = "prop-name";
+        let title = document.createElement("p");
+        title.innerText = "Add new property";
+        outer_label.appendChild(title);
+
+        k_div.append(outer_label)
+
+        let chooser = document.createElement("select");
+        chooser.id = "prop-name";
+        let no_choice = document.createElement("option");
+        no_choice.innerText = "Select one";
+        chooser.appendChild(no_choice);
+        outer_label.appendChild(chooser);
+        for (x of SEEN_PROPS) {
+            let choice = document.createElement("option");
+            choice.innerText = x;
+            chooser.appendChild(choice);
+        }
+        let custom_choice = document.createElement("option");
+        custom_choice.innerText = "Other...";
+        chooser.appendChild(custom_choice);
+        chooser.onchange = rerender;
+
+        chooser.selectedIndex = current_selected;
+        if (current_selected === chooser.children.length - 1) {
+            let field = document.createElement("input");
+            field.id = "prop-name-custom";
+            field.placeholder = "property name";
+            outer_label.appendChild(field);
+            field.oninput = () => { field.classList.remove("danger"); };
+        }
+        if (current_selected > 0) {
+            let data = document.createElement("textArea");
+            data.id = "new-prop-data";
+            data.innerText = "";
+            outer_label.appendChild(data);
+
+            let auth_lab = document.createElement("label");
+            var lab = document.createElement("p");
+            lab.classList.add("prop-name");
+            lab.innerText = "Author (only for logs)";
+            auth_lab.appendChild(lab);
+            k_div.appendChild(auth_lab);
+
+            let author_text = document.createElement("input");
+            author_text.type = "text";
+            author_text.id = "author";
+            auth_lab.appendChild(author_text);
+            author_text.oninput = () => { document.getElementById("author").classList.remove("danger"); };
+
+            let cancel_button = document.createElement("button");
+            cancel_button.innerText = "Cancel";
+            k_div.appendChild(cancel_button)
+            cancel_button.onclick = async () => {
+                chooser.selectedIndex = 0;
+                rerender();
+            };
+
+            let submit_button = document.createElement("button");
+            submit_button.innerText = "Submit";
+            k_div.appendChild(submit_button);
+
+            submit_button.onclick = async () => {
+                let name = document.getElementById("author").value;
+                if (name === "") {
+                    document.getElementById("author").classList.add("danger");
+                    return;
+                }
+                let prop;
+                if (current_selected === chooser.children.length - 1) {
+                    prop = document.getElementById("prop-name-custom").value;
+                    if (prop === "") {
+                        document.getElementById("author").classList.add("danger");
+                        return;
+                    }
+                } else {
+                    prop = chooser.value;
+                }
+                let value = document.getElementById("new-prop-data").value;
+                let data = {"prop": prop, "value": value, "author": name};
+                console.log(data);
+                let resp = await fetch(`/api/set_data?idx=${CURRENT_IDX}`, {
+                    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                console.log(await resp.text());
+                chooser.selectedIndex = 0;
+                await run();
+            };
         }
     }
 }
