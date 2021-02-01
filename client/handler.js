@@ -165,7 +165,7 @@ function render_cell_data(data) {
             cell_data.appendChild(k_div);
 
             let label = document.createElement("label");
-            label.element_id = id;
+            label.htmlFor = id;
             var lab = document.createElement("p");
             lab.classList.add("prop-name");
             lab.innerText = k;
@@ -175,7 +175,7 @@ function render_cell_data(data) {
             if (EDITING_FIELD === k) {
                 let data = document.createElement("textArea");
                 data.id = id;
-                data.innerText = v;
+                data.value = v;
                 label.appendChild(data);
 
                 let auth_lab = document.createElement("label");
