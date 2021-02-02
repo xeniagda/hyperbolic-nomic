@@ -15,6 +15,7 @@ SPACING = 0.015;
 
 CURRENT_IDX = 0;
 ORIENTATION = 0;
+RENDER_DISTANCE = 3;
 
 function draw(idx, assoc_data, corners, center) {
     let id = "tile-" + idx;
@@ -454,7 +455,7 @@ function render_cell_data(data) {
 var a;
 var current_history;
 async function refresh() {
-    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&render_distance=3`);
+    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&render_distance=${RENDER_DISTANCE}`);
     if (await resp.status === 400) {
         status = await resp.text();
         alert(`Error! Server says ${status} when trying to get the tiles`);
@@ -466,6 +467,7 @@ async function refresh() {
 }
 
 function rerender() {
+    document.getElementById("render-distance").innerText = RENDER_DISTANCE;
     let to_render = get_all_ids(a);
     for (elem of Array.from(document.getElementsByClassName("cell-outer"))) {
         let idx = 0 | elem.dataset.idx;
