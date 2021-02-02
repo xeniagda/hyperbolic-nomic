@@ -17,11 +17,17 @@
 # Neighbours of a tile are indexed starting with the parent node at index 0, continuing
 # counter-clockwise. The origin has index 0 pointing upwards
 
+import random
 from abc import ABC, abstractmethod
 from copy import deepcopy
 from tiledata import TileData
 import pickle
 
+NATURE = {
+    "Has tree": 0.1,
+    "Has rock": 0.1,
+    "Has bush": 0.1,
+}
 
 class TileGenerationContext:
     def __init__(self, n_steps_out):
@@ -37,6 +43,15 @@ class Tile(ABC):
         TileGenerationContext.TILE_CTR += 1
         self.assoc_data = TileData()
         self.all_children_idx_cache = set() # May not be 100% correct, just for heuristics
+
+        self.generate_nature()
+
+    def generate_nature(self):
+        for name, prob in NATURE.items():
+            if random.random() < prob:
+                self.assoc_data.set_field(name, "", "<SERVER>")
+            else:
+                self.assoc_data.delete_field(name, "<SERVER>")
 
     # Don't pickle the cache!
     def __getstate__(self):
