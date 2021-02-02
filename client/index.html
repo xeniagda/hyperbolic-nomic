@@ -191,6 +191,12 @@ textarea {
     transition: height 0.6s;
 }
 
+#settings {
+    margin-top: 3ex;
+    padding-top: 3ex;
+    border-top: 3px solid white;
+}
+
         </style>
     </head>
     <body>
@@ -246,6 +252,25 @@ document.getElementById("jumper").onclick = async () => {
     CURRENT_IDX = id;
     await run();
 }
+
+document.body.onkeydown = async e => {
+    if (e.target == document.body) {
+        console.log(e);
+        if (e.key == "ArrowLeft") {
+            ORIENTATION += e.shiftKey ? 0.1 : 1;
+            ORIENTATION %= 7;
+            e.preventDefault();
+            await run();
+        } else if (e.key == "ArrowRight") {
+            ORIENTATION -= e.shiftKey ? 0.1 : 1;
+            ORIENTATION += 7;
+            ORIENTATION %= 7;
+            e.preventDefault();
+            await run();
+        }
+    }
+
+};
     </script>
     <script src="handler.js"></script>
 </html>
