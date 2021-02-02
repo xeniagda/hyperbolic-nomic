@@ -22,6 +22,8 @@ else:
 
 WORLD_LOCK = asyncio.Lock()
 
+DIRTY = False
+
 def render(view, render_distance, seen_at):
     if view.node.idx in seen_at and seen_at[view.node.idx] >= render_distance:
         return None
@@ -87,6 +89,7 @@ async def tiles_around(req):
     return web.Response(text=json.dumps({"rendered": rendered, "history": history}))
 
 async def set_data(req):
+    global DIRTY
     if "idx" not in req.query:
         return web.Response(text="no idx", status=400)
     try:
@@ -114,11 +117,12 @@ async def set_data(req):
             return web.Response(text="no such idx", status=400)
 
         tile.assoc_data.set_field(prop, value, author)
-        save()
+        DIRTY = True
 
     return web.Response(text="cool")
 
 async def delete_data(req):
+    global DIRTY
     if "idx" not in req.query:
         return web.Response(text="no idx", status=400)
     try:
@@ -142,7 +146,7 @@ async def delete_data(req):
 
         if not tile.assoc_data.delete_field(prop, author):
             lg.warning(f"Already deleted!")
-        save()
+        DIRTY = True
 
     return web.Response(text="cool")
 
@@ -150,6 +154,18 @@ async def on_shutdown(app):
     lg.info("Writing world...")
     save()
     lg.info("Done!")
+
+async def save_interval():
+    global DIRTY
+    while True:
+        await asyncio.sleep(60 * 30)
+        if DIRTY:
+            async with WORLD_LOCK:
+                save()
+            DIRTY = False
+
+async def on_startup(app):
+    asyncio.create_task(save_interval())
 
 def save():
     with open(SAVE_FILE, "wb") as f:
@@ -190,5 +206,6 @@ if __name__ == "__main__":
         web.static("/", "client"),
     ])
     app.on_shutdown.append(on_shutdown)
+    app.on_startup.append(on_startup)
 
     web.run_app(app, port=9080, access_log=None)
