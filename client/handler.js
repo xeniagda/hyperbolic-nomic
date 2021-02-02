@@ -319,6 +319,7 @@ function render_cell_data(data) {
         chooser.appendChild(no_choice);
         outer_label.appendChild(chooser);
         for (x of SEEN_PROPS) {
+            if (x in a.assoc_data) { continue }
             let choice = document.createElement("option");
             choice.innerText = x;
             chooser.appendChild(choice);
