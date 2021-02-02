@@ -1,5 +1,8 @@
 import sys
 import pickle
+
+from hypertiling import Tile
+
 if len(sys.argv) != 4:
     print("Usage: python3 upgrader.py <action> <old file> <destination>")
     exit()
@@ -27,6 +30,11 @@ def map_data(fn, node):
             node.children[i] = map_data(fn, node.children[i])
 
     return node
+
+if action == "regen-nature":
+    print("Regenerating nature")
+    map_inplace(Tile.generate_nature, w)
+    print("Regenerated nature")
 
 if action == "unyeet":
     print("Starting unyeeting")
