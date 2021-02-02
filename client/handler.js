@@ -120,7 +120,7 @@ function draw(idx, assoc_data, corners, center) {
 
     outer.onclick = e => {
         CURRENT_IDX = idx;
-        ORIENTATION = 0 | (0.5 + orientation);
+        ORIENTATION = orientation;
         run();
     };
 
@@ -143,7 +143,7 @@ function render(tile, path) {
         SEEN_PROPS.add(key);
     }
     let fns = [];
-    let [corners, [center]] = transform_poly_along_path(origin_corners, path, [math.complex(0, 0)]);
+    let [corners, [center]] = transform_poly_along_path(get_origin_corners(ORIENTATION), path, [math.complex(0, 0)]);
     corners = reorient(corners, tile.orientation);
     fns.push(draw(tile.idx, tile.assoc_data, corners, center));
     for (var i = 0; i < tile.neighbours.length; i++) {
@@ -454,7 +454,7 @@ function render_cell_data(data) {
 var a;
 var current_history;
 async function refresh() {
-    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&orientation=${ORIENTATION}&render_distance=3`);
+    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&render_distance=3`);
     if (await resp.status === 400) {
         status = await resp.text();
         alert(`Error! Server says ${status} when trying to get the tiles`);

@@ -84,13 +84,16 @@ let side_circle_origin_dist = (corner_dist + 1 / corner_dist) / (2 * math.cos(al
 let side_circle_radius_sq = corner_dist ** 2 * (1 - math.cos(alpha) ** 2) + (side_circle_origin_dist - corner_dist * math.cos(alpha)) ** 2;
 let side_circle_radius = side_circle_radius_sq ** 0.5;
 
-var origin_corners = [];
-for (var i = 0; i < p; i++) {
-    let angle = (-i + 0.5) / p * math.pi * 2;
-    let unit_point = math.complex(math.cos(angle), math.sin(angle));
-    let circle_center_point = math.mul(unit_point, corner_dist);
+function get_origin_corners(orientation) {
+    var origin_corners = [];
+    for (var i = 0; i < p; i++) {
+        let angle = (-i + 0.5 + orientation) / p * math.pi * 2;
+        let unit_point = math.complex(math.cos(angle), math.sin(angle));
+        let circle_center_point = math.mul(unit_point, corner_dist);
 
-    origin_corners.push(circle_center_point);
+        origin_corners.push(circle_center_point);
+    }
+    return origin_corners;
 }
 
 function reorient(poly, new_orientation) {
