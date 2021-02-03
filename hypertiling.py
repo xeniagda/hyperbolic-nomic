@@ -45,6 +45,7 @@ class Tile(ABC):
         self.all_children_idx_cache = set() # May not be 100% correct, just for heuristics
 
         self.generate_nature()
+        self.generate_water()
 
     def generate_nature(self):
         for name, prob in NATURE.items():
@@ -52,6 +53,12 @@ class Tile(ABC):
                 self.assoc_data.set_field(name, "", "<SERVER>")
             else:
                 self.assoc_data.delete_field(name, "<SERVER>")
+
+    def generate_water(self):
+        if self.idx % 2 == 1:
+            self.assoc_data.set_field("Sea", "", "<SERVER>")
+        else:
+            self.assoc_data.delete_field("Sea", "<SERVER>")
 
     # Don't pickle the cache!
     def __getstate__(self):

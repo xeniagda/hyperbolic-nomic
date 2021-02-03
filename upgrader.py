@@ -36,6 +36,11 @@ if action == "regen-nature":
     map_inplace(Tile.generate_nature, w)
     print("Regenerated nature")
 
+if action == "regen-water":
+    print("Regenerating water")
+    map_inplace(Tile.generate_water, w)
+    print("Regenerated water")
+
 if action == "unyeet":
     print("Starting unyeeting")
 
