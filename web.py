@@ -106,7 +106,10 @@ async def set_data(req):
     value = data["value"]
     if "author" not in data:
         return web.Response(text="no author", status=400)
-    author = data["author"]
+    author = data["author"].strip()
+
+    if author == "<SERVER>":
+        return web.Response(text="invalid", status=400)
 
     lgval = repr(value) if len(value) < 40 else repr(value[:40]) + "..."
     lg.info(f"{author} ({req.remote}) changing {prop} to {lgval} at {idx}")
@@ -136,7 +139,10 @@ async def delete_data(req):
     prop = data["prop"]
     if "author" not in data:
         return web.Response(text="no author", status=400)
-    author = data["author"]
+    author = data["author"].strip()
+
+    if author == "<SERVER>":
+        return web.Response(text="invalid", status=400)
 
     lg.info(f"{author} ({req.remote}) deleting {prop} at {idx}")
     async with WORLD_LOCK:
