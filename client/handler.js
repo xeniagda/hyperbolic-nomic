@@ -23,6 +23,7 @@ const PROP_CLASSES = {
     "Has tree": "has-tree",
     "Has rock": "has-rock",
     "Has bush": "has-bush",
+    "Sea": "sea",
 }
 
 function draw(idx, assoc_data, corners, center) {
