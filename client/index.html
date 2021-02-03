@@ -68,6 +68,9 @@ body {
 .cell-inner.has-data {
     background: var(--col-high-prim);
 }
+.cell-inner.has-data.is-origin {
+    background: radial-gradient(circle, rgba(63,94,251,1) 0%, rgba(252,70,107,1) 100%) !important;
+}
 .cell-inner.has-data.has-tree {
     background: green;
 }
@@ -76,6 +79,15 @@ body {
 }
 .cell-inner.has-data.has-rock {
     background: #555555;
+}
+.cell-inner.has-data.has-players::after {
+    content: "🧑";
+    position: absolute;
+    left: 0%;
+    right: 0%;
+    top: 50%;
+    height: 100%;
+    z-index: -1;
 }
 
 .active {

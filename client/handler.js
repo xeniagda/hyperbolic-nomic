@@ -18,6 +18,8 @@ ORIENTATION = 0;
 RENDER_DISTANCE = 3;
 
 const PROP_CLASSES = {
+    "Origin": "is-origin",
+    "Players here": "has-players",
     "Has tree": "has-tree",
     "Has rock": "has-rock",
     "Has bush": "has-bush",
