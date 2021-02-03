@@ -17,6 +17,12 @@ CURRENT_IDX = 0;
 ORIENTATION = 0;
 RENDER_DISTANCE = 3;
 
+const PROP_CLASSES = {
+    "Has tree": "has-tree",
+    "Has rock": "has-rock",
+    "Has bush": "has-bush",
+}
+
 function draw(idx, assoc_data, corners, center) {
     let id = "tile-" + idx;
 
@@ -70,6 +76,14 @@ function draw(idx, assoc_data, corners, center) {
     } else {
         inner.classList.remove("has-data");
     }
+    for (prop in PROP_CLASSES) {
+        if (prop in assoc_data) {
+            inner.classList.add(PROP_CLASSES[prop]);
+        } else {
+            inner.classList.remove(PROP_CLASSES[prop]);
+        }
+    }
+
     if (CURRENT_IDX == idx) {
         outer.classList.add("active");
     } else {
