@@ -184,32 +184,30 @@ if __name__ == "__main__":
     app = web.Application()
 
     app.add_routes([
-        web.get("/api/tiles", tiles_around),
-        web.post("/api/set_data", set_data),
-        web.post("/api/delete_data", delete_data),
-        web.get("/", lambda req: web.Response(status=301, headers={"Location": "index.html"})),
+        web.get("/hyperbolic-nomic/api/tiles", tiles_around),
+        web.post("/hyperbolic-nomic/api/set_data", set_data),
+        web.post("/hyperbolic-nomic/api/delete_data", delete_data),
         web.get(
-            "/index.html",
+            "/hyperbolic-nomic/index.html",
             lambda _: web.Response(
                 text = \
-                    open("client/index.html", "r")
+                    open("static/index.html", "r")
                     .read()
                     .replace("TEMPLATE TEXT", " conic nomic 2 heptagonal hyperbolic space map editor thing gamestate keywords "),
                 content_type="text/html",
             )
         ),
         web.get(
-            "/hidden-yes-very-secret.html",
+            "/hyperbolic-nomic/hidden-yes-very-secret.html",
             lambda _: web.Response(
                 text = \
-                    open("client/index.html", "r")
+                    open("static/index.html", "r")
                     .read()
                     .replace("colors-bright.css", "colors-dark.css")
                     .replace("TEMPLATE TEXT", "welcome to hacker space 😎"),
                 content_type="text/html",
             )
         ),
-        web.static("/", "client"),
     ])
     app.on_shutdown.append(on_shutdown)
     app.on_startup.append(on_startup)

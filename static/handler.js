@@ -263,7 +263,7 @@ function render_cell_data(data) {
                         return;
                     }
                     let data = {"prop": k, "author": name};
-                    await fetch(`/api/delete_data?idx=${CURRENT_IDX}`, {
+                    await fetch(`/hyperbolic-nomic/api/delete_data?idx=${CURRENT_IDX}`, {
                         method: 'POST', // *GET, POST, PUT, DELETE, etc.
                         headers: {
                             'Content-Type': 'application/json'
@@ -286,7 +286,7 @@ function render_cell_data(data) {
                     }
                     let value = document.getElementById(id).value;
                     let data = {"prop": k, "value": value, "author": name};
-                    await fetch(`/api/set_data?idx=${CURRENT_IDX}`, {
+                    await fetch(`/hyperbolic-nomic/api/set_data?idx=${CURRENT_IDX}`, {
                         method: 'POST', // *GET, POST, PUT, DELETE, etc.
                         headers: {
                             'Content-Type': 'application/json'
@@ -410,7 +410,7 @@ function render_cell_data(data) {
                 let value = document.getElementById("new-prop-data").value;
                 let data = {"prop": prop, "value": value, "author": name};
                 console.log(data);
-                let resp = await fetch(`/api/set_data?idx=${CURRENT_IDX}`, {
+                let resp = await fetch(`/hyperbolic-nomic/api/set_data?idx=${CURRENT_IDX}`, {
                     method: 'POST', // *GET, POST, PUT, DELETE, etc.
                     headers: {
                         'Content-Type': 'application/json'
@@ -473,7 +473,7 @@ function render_cell_data(data) {
 var a;
 var current_history;
 async function refresh() {
-    let resp = await fetch(`/api/tiles?idx=${CURRENT_IDX}&render_distance=${RENDER_DISTANCE}`);
+    let resp = await fetch(`/hyperbolic-nomic/api/tiles?idx=${CURRENT_IDX}&render_distance=${RENDER_DISTANCE}`);
     if (await resp.status === 400) {
         status = await resp.text();
         alert(`Error! Server says ${status} when trying to get the tiles`);
