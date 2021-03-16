@@ -184,11 +184,11 @@ if __name__ == "__main__":
     app = web.Application()
 
     app.add_routes([
-        web.get("/hyperbolic-nomic/api/tiles", tiles_around),
-        web.post("/hyperbolic-nomic/api/set_data", set_data),
-        web.post("/hyperbolic-nomic/api/delete_data", delete_data),
+        web.get("/tiles", tiles_around),
+        web.post("/set_data", set_data),
+        web.post("/delete_data", delete_data),
         web.get(
-            "/hyperbolic-nomic/index.html",
+            "/index.html",
             lambda _: web.Response(
                 text = \
                     open("static/index.html", "r")
@@ -198,7 +198,7 @@ if __name__ == "__main__":
             )
         ),
         web.get(
-            "/hyperbolic-nomic/hidden-yes-very-secret.html",
+            "/hidden-yes-very-secret.html",
             lambda _: web.Response(
                 text = \
                     open("static/index.html", "r")
